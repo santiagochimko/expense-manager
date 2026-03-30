@@ -1,7 +1,9 @@
 import {
     createCategory,
     getCategoriesByUser,
-    getCategoryById
+    getCategoryById,
+    updateCategory,
+    deleteCategory
 } from "../services/categories.service.js";
 
 export const create = async (req, res, next) => {
@@ -36,6 +38,32 @@ export const getById = async (req, res, next) => {
 
         res.status(200).json({
             message: "Categoría obtenida correctamente",
+            data: category
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const update = async (req, res, next) => {
+    try {
+        const category = await updateCategory(req.params.id, req.user.id, req.body);
+
+        res.status(200).json({
+            message: "Categoría actualizada correctamente",
+            data: category
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const remove = async (req, res, next) => {
+    try {
+        const category = await deleteCategory(req.params.id, req.user.id);
+
+        res.status(200).json({
+            message: "Categoría eliminada correctamente",
             data: category
         });
     } catch (error) {

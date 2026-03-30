@@ -23,6 +23,11 @@ export const getExpenseByUser = async (userId, queryParams) => {
         isActive: true
     };
 
+    //Filtro por categoría
+    if (queryParams.category) {
+        filters.category = queryParams.category;
+    }
+
     //Filtro por texto en title, usando regex case insensitive
     if (queryParams.search) {
         filters.title = { $regex: queryParams.search, $options: 'i' };
@@ -45,12 +50,51 @@ export const getExpenseByUser = async (userId, queryParams) => {
     };
 };
 
-export const getExpenseById = async (id, userId) => {
+export const getExpenseById = async (expenseId, userId) => {
     const expense = await Expense.findOne({
-        _id: id,
+        _id: expenseId,
         user: userId,
         isActive: true
     }).populate("category", "name color");
+
+    if (!expense) {
+        throw createError("Gasto no encontrado", 404);
+    }
+
+    return expense;
+};
+
+export const updateExpense = async (expenseId, userId, data) => {
+    const expense = await Expense.findOneAndUpdate(
+        {
+            _id: expenseId,
+            user: userId,
+            isActive: true
+        },
+        data,
+        {
+            new: true,
+            runValidators: true
+        }
+    ).populate("category", "name color");
+
+    if (!expense) {
+        throw createError("Gasto no encontrado", 404);
+    }
+
+    return expense;
+};
+
+export const deleteExpense = async (expenseId, userId) => {
+    const expense = await Expense.findOneAndUpdate(
+        {
+            _id: expenseId,
+            user: userId,
+            isActive: true
+        },
+        { isActive: false },
+        { new: true }
+    );
 
     if (!expense) {
         throw createError("Gasto no encontrado", 404);

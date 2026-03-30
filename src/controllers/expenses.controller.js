@@ -2,6 +2,8 @@ import {
     createExpense,
     getExpenseByUser,
     getExpenseById,
+    updateExpense,
+    deleteExpense
 } from '../services/expenses.service.js';
 
 export const create = async (req, res, next) => {
@@ -36,6 +38,32 @@ export const getById = async (req, res, next) => {
 
         res.status(200).json({
             message: "Gasto obtenido correctamente",
+            data: expense
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const update = async (req, res, next) => {
+    try {
+        const expense = await updateExpense(req.params.id, req.user.id, req.body);
+
+        res.status(200).json({
+            message: "Gasto actualizado correctamente",
+            data: expense
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const remove = async (req, res, next) => {
+    try {
+        const expense = await deleteExpense(req.params.id, req.user.id);
+
+        res.status(200).json({
+            message: "Gasto eliminado correctamente",
             data: expense
         });
     } catch (error) {
