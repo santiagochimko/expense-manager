@@ -1,9 +1,9 @@
 import Category from "../models/Category.js";
 import createError from "../utils/createError.js";
 
-export const createCategory = async (DataTransfer, userId) => {
+export const createCategory = async (data, userId) => {
     const category = await Category.create({
-        ...DataTransfer,
+        ...data,
         user: userId
     })
 
@@ -31,3 +31,42 @@ export const getCategoryById = async (categoryId, userId) => {
 
     return category;
 };
+
+export const updateCategory = async (categoryId, userId, data) => {
+    const category = await Category.findOneAndUpdate(
+        {
+            _id: categoryId,
+            user: userId,
+            isActive: true
+        },
+        data,
+        {
+            new: true,
+            runValidators: true
+        }
+    );
+
+    if (!category) {
+        throw createError("Categoría no encontrada", 404);
+    }
+
+    return category;
+}
+
+export const deleteCategory = async (categoryId, userId) => {
+    const category = await Category.findOneAndUpdate(
+        {
+            _id: categoryId,
+            user: userId,
+            isActive: true
+        },
+        { isActive: false },
+        { new: true }
+    );
+
+    if (!category) {
+        throw createError("Categoría no encontrada", 404);
+    }
+
+    return category;
+}
