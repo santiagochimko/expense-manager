@@ -1,6 +1,6 @@
 import {
     createExpense,
-    getExpensesByUser,
+    getExpenseByUser,
     getExpenseById,
 } from '../services/expenses.service.js';
 

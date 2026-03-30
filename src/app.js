@@ -14,7 +14,7 @@ app.use(cors());
 
 //Rutas de la API
 //Todo queda colgado de /api y dentro se maneja el versionado
-app.use('/api/v1', apiRoutes);
+app.use('/api', apiRoutes);
 
 //Middleware para rutas inexistentes
 //Va despues de declarar las rutas validas.

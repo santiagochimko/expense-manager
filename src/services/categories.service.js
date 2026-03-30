@@ -20,7 +20,7 @@ export const getCategoriesByUser = async (userId) => {
 
 export const getCategoryById = async (categoryId, userId) => {
     const category = await Category.findOne({
-        _id: id,
+        _id: categoryId,
         user: userId,
         isActive: true
     });

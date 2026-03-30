@@ -5,7 +5,7 @@ const validate = (schema, property = "body") => {
     return (req, res, next) => {
         const {error, value} = schema.validate(req[property], {
             abortEarly: false, 
-            stripUnkown: true
+            stripUnknown: true
         });
 
         if(error) {
