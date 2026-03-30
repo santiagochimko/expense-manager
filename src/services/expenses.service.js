@@ -1,10 +1,28 @@
+import User from '../models/User.js';
 import Expense from '../models/Expense.js';
 import createError from '../utils/createError.js';
 import { getPagination } from '../utils/pagination.js';
 
 export const createExpense = async (data, userId) => {
-    //TODO: validar limite plan plus
+    // Obtener usuario
+    const user = await User.findById(userId);
 
+    if (!user) {
+        throw createError("Usuario no encontrado", 404);
+    }
+
+    //Validar limite si es Plus
+    if (user.plan === "plus") {
+        const count = await Expense.countDocuments({
+            user: userId,
+            isActive: true
+        });
+        if (count >= 4) {
+            throw createError("Has alcanzado el límite de 4 gastos para el plan Plus. Actualiza a Premium para tener gastos ilimitados.", 403);
+        }
+    }
+
+    //Crear gasto
     const expense = await Expense.create({
         ...data,
         user: userId
