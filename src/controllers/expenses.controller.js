@@ -19,7 +19,7 @@ export const create = async (req, res, next) => {
 
 export const getAll = async (req, res, next) => {
     try {
-        const result = await getExpensesByUser(req.user.id, req.query);
+        const result = await getExpenseByUser(req.user.id, req.query);
 
         res.status(200).json({
             message: "Gastos obtenidos correctamente",
