@@ -2,6 +2,13 @@ import User from '../models/User.js';
 import Expense from '../models/Expense.js';
 import createError from '../utils/createError.js';
 import { getPagination } from '../utils/pagination.js';
+import {
+    getCache,
+    setCache,
+    deleteCache,
+    deleteCacheByPattern,
+    CACHE_TTL
+} from "../utils/cache.js";
 
 export const createExpense = async (data, userId) => {
     // Obtener usuario
@@ -28,12 +35,26 @@ export const createExpense = async (data, userId) => {
         user: userId
     });
 
+    await deleteCacheByPattern(`expenses:user:${userId}*`);
+    // await deleteCache(`dashboard:summary:${userId}`);
+    // await deleteCache(`dashboard:charts:${userId}`);
+
     return expense;
 };
 
 export const getExpenseByUser = async (userId, queryParams) => {
 
     const { page, limit, skip } = getPagination(queryParams.page, queryParams.limit);
+
+    const search = queryParams.search || "";
+    const category = queryParams.category || "";
+
+    const cacheKey = `expenses:user:${userId}:page:${page}:limit:${limit}:search:${search}:category:${category}`;
+
+    const cachedExpenses = await getCache(cacheKey);
+    if (cachedExpenses) {
+        return cachedExpenses;
+    }
 
     //Filtro base: solo gastos del usuario y activos
     const filters = {
@@ -59,16 +80,27 @@ export const getExpenseByUser = async (userId, queryParams) => {
 
     const total = await Expense.countDocuments(filters);
 
-    return {
+    const result = {
         page,
         limit,
         total,
         totalPages: Math.ceil(total / limit),
         data: expenses
     };
+
+    await setCache(cacheKey, result, CACHE_TTL.EXPENSES);
+
+    return result;
 };
 
 export const getExpenseById = async (expenseId, userId) => {
+    const cacheKey = `expenses:user:${userId}:id:${expenseId}`;
+
+    const cachedExpense = await getCache(cacheKey);
+    if (cachedExpense) {
+        return cachedExpense;
+    }
+
     const expense = await Expense.findOne({
         _id: expenseId,
         user: userId,
@@ -78,6 +110,8 @@ export const getExpenseById = async (expenseId, userId) => {
     if (!expense) {
         throw createError("Gasto no encontrado", 404);
     }
+
+    await setCache(cacheKey, expense, CACHE_TTL.EXPENSES);
 
     return expense;
 };
@@ -100,6 +134,10 @@ export const updateExpense = async (expenseId, userId, data) => {
         throw createError("Gasto no encontrado", 404);
     }
 
+    await deleteCacheByPattern(`expenses:user:${userId}*`);
+    // await deleteCache(`dashboard:summary:${userId}`);
+    // await deleteCache(`dashboard:charts:${userId}`);
+
     return expense;
 };
 
@@ -117,6 +155,10 @@ export const deleteExpense = async (expenseId, userId) => {
     if (!expense) {
         throw createError("Gasto no encontrado", 404);
     }
+
+    await deleteCacheByPattern(`expenses:user:${userId}*`);
+    // await deleteCache(`dashboard:summary:${userId}`);
+    // await deleteCache(`dashboard:charts:${userId}`);
 
     return expense;
 };
