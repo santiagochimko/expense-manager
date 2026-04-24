@@ -3,6 +3,19 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import createError from "../utils/createError.js";
 
+const generateToken = (user) => {
+    return jwt.sign(
+        {
+            id: user._id,
+            username: user.username,
+            role: user.role,
+            plan: user.plan
+        },
+        process.env.JWT_SECRET,
+        { expiresIn: "1h" }
+    );
+};
+
 export const registerUser = async (userData) => {
     const { username, email, password, role } = userData;
 
@@ -32,7 +45,9 @@ export const registerUser = async (userData) => {
         plan: "plus"
     });
 
-    return newUser;
+    const token = generateToken(newUser);
+
+    return { user: newUser, token };
 };
 
 export const loginUser = async ({ username, password }) => {
@@ -48,16 +63,7 @@ export const loginUser = async ({ username, password }) => {
         throw createError("Credenciales incorrectas", 401);
     }
 
-    const token = jwt.sign(
-        {
-            id: user._id,
-            username: user.username,
-            role: user.role,
-            plan: user.plan
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: "1h" }
-    );
+    const token = generateToken(user);
 
     return { user, token };
 }
