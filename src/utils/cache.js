@@ -5,8 +5,8 @@ export const CACHE_TTL = {
     USER: 60,
     CATEGORIES: 60,
     EXPENSES: 60,
-    // DASHBOARD: 60,
-    // EXCHANGE: 300
+    DASHBOARD: 60,
+    EXCHANGE: 300
 };
 
 //Obtiene un valor cache y lo parsea

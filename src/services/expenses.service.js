@@ -36,8 +36,8 @@ export const createExpense = async (data, userId) => {
     });
 
     await deleteCacheByPattern(`expenses:user:${userId}*`);
-    // await deleteCache(`dashboard:summary:${userId}`);
-    // await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCache(`dashboard:summary:${userId}`);
+    await deleteCache(`dashboard:charts:${userId}`);
 
     return expense;
 };
@@ -93,7 +93,7 @@ export const getExpenseByUser = async (userId, queryParams) => {
     return result;
 };
 
-export const getExpenseById = async (expenseId, userId) => {
+export const getExpensesById = async (expenseId, userId) => {
     const cacheKey = `expenses:user:${userId}:id:${expenseId}`;
 
     const cachedExpense = await getCache(cacheKey);
@@ -135,8 +135,8 @@ export const updateExpense = async (expenseId, userId, data) => {
     }
 
     await deleteCacheByPattern(`expenses:user:${userId}*`);
-    // await deleteCache(`dashboard:summary:${userId}`);
-    // await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCache(`dashboard:summary:${userId}`);
+    await deleteCache(`dashboard:charts:${userId}`);
 
     return expense;
 };
@@ -157,8 +157,8 @@ export const deleteExpense = async (expenseId, userId) => {
     }
 
     await deleteCacheByPattern(`expenses:user:${userId}*`);
-    // await deleteCache(`dashboard:summary:${userId}`);
-    // await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCache(`dashboard:summary:${userId}`);
+    await deleteCache(`dashboard:charts:${userId}`);
 
     return expense;
 };

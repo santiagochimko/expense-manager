@@ -9,7 +9,7 @@ export const getCurrentUser = async (userId) => {
     if (cachedUser) {
         return cachedUser;
     }
-    
+
     const user = await User.findById(userId);
 
     if (!user) {
@@ -52,8 +52,8 @@ export const updateUserPlan = async (userId, newPlan) => {
 
     //invalidar cache del usuario y dashboard
     await deleteCache(`user:${userId}`);
-    // await deleteCache(`dashboard:summary:${userId}`);
-    // await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCache(`dashboard:summary:${userId}`);
+    await deleteCache(`dashboard:charts:${userId}`);
 
     return user;
 };
