@@ -1,7 +1,7 @@
 import {
     createExpense,
     getExpensesByUser,
-    getExpenseById,
+    getExpensesById,
     updateExpense,
     deleteExpense
 } from '../services/expenses.service.js';
@@ -34,7 +34,7 @@ export const getAll = async (req, res, next) => {
 
 export const getById = async (req, res, next) => {
     try {
-        const expense = await getExpenseById(req.params.id, req.user.id);
+        const expense = await getExpensesById(req.params.id, req.user.id);
 
         res.status(200).json({
             message: "Gasto obtenido correctamente",

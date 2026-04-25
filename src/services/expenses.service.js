@@ -42,7 +42,7 @@ export const createExpense = async (data, userId) => {
     return expense;
 };
 
-export const getExpenseByUser = async (userId, queryParams) => {
+export const getExpensesByUser = async (userId, queryParams) => {
 
     const { page, limit, skip } = getPagination(queryParams.page, queryParams.limit);
 

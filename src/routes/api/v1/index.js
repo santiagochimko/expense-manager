@@ -5,6 +5,7 @@ import expensesRoutes from "./expenses.routes.js";
 import usersRoutes  from "./users.routes.js";
 import adminRoutes  from "./admin.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
+import exchangeRoutes from "./exchange.routes.js";
 
 const router = Router();
 
@@ -21,5 +22,6 @@ router.use("/expenses", expensesRoutes);
 router.use("/users", usersRoutes);
 router.use("/admin", adminRoutes);
 router.use("/dashboard", dashboardRoutes);
+router.use("/exchange-rates", exchangeRoutes);
 
 export default router;
