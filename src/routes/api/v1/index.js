@@ -6,6 +6,7 @@ import usersRoutes  from "./users.routes.js";
 import adminRoutes  from "./admin.routes.js";
 import dashboardRoutes from "./dashboard.routes.js";
 import exchangeRoutes from "./exchange.routes.js";
+import aiRoutes from "./ai.routes.js";
 
 const router = Router();
 
@@ -23,5 +24,6 @@ router.use("/users", usersRoutes);
 router.use("/admin", adminRoutes);
 router.use("/dashboard", dashboardRoutes);
 router.use("/exchange-rates", exchangeRoutes);
+router.use("/ai", aiRoutes);
 
 export default router;
