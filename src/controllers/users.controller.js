@@ -13,16 +13,7 @@ export const getMe = async (req, res, next) => {
 
         res.status(200).json({
             message: "Usuario autenticado",
-            data: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                plan: user.plan,
-                isActive: user.isActive,
-                createdAt: user.createdAt,
-                updatedAt: user.updatedAt
-            }
+            data: user
         });
 
     } catch (error) {

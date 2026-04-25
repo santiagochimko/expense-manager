@@ -81,8 +81,8 @@ export const updateCategory = async (categoryId, userId, data) => {
     await deleteCache(`categories:user:${userId}`);
     await deleteCache(`categories:user:${userId}:id:${categoryId}`);
     await deleteCacheByPattern(`expenses:user:${userId}*`);
-    // await deleteCache(`dashboard:summary:${userId}`);
-    // await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCache(`dashboard:summary:${userId}`);
+    await deleteCache(`dashboard:charts:${userId}`);
 
     return category;
 }
@@ -105,8 +105,8 @@ export const deleteCategory = async (categoryId, userId) => {
     await deleteCache(`categories:user:${userId}`);
     await deleteCache(`categories:user:${userId}:id:${categoryId}`);
     await deleteCacheByPattern(`expenses:user:${userId}*`);
-    // await deleteCache(`dashboard:summary:${userId}`);
-    // await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCache(`dashboard:summary:${userId}`);
+    await deleteCache(`dashboard:charts:${userId}`);
 
     return category;
 }
