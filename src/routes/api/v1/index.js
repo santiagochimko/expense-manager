@@ -4,6 +4,7 @@ import categoriesRoutes from "./categories.routes.js";
 import expensesRoutes from "./expenses.routes.js";
 import usersRoutes  from "./users.routes.js";
 import adminRoutes  from "./admin.routes.js";
+import dashboardRoutes from "./dashboard.routes.js";
 
 const router = Router();
 
@@ -19,5 +20,6 @@ router.use("/categories", categoriesRoutes);
 router.use("/expenses", expensesRoutes);
 router.use("/users", usersRoutes);
 router.use("/admin", adminRoutes);
+router.use("/dashboard", dashboardRoutes);
 
 export default router;
