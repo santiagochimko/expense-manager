@@ -1947,6 +1947,14 @@
     {
       "key": "expense_id",
       "value": ""
+    },
+    {
+      "key": "PROD_BASE_URL",
+      "value": ""
+    },
+    {
+      "key": "BASE_URL_LOCAL",
+      "value": ""
     }
   ]
 }
