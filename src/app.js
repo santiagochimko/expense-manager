@@ -11,7 +11,7 @@ const app = express();
 const corsOptions = {
     origin: [
         "http://localhost:3000",
-        //"https://tu-frontend.vercel.app",
+        "https://expense-manager-backend-gamma.vercel.app/",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
