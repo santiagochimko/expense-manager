@@ -1,20 +1,40 @@
 import xss from "xss";
 
-const xssSanitizer = (req, res, next) => {
-    // Función para sanitizar recursivamente todos los valores de un objeto
-    const sanitizeObject = (obj) => {
-        for (const key in obj) {
-            if (typeof obj[key] === "string") {
-                obj[key] = xss(obj[key]); // sanitize string
-            } else if (typeof obj[key] === "object" && obj[key] !== null) {
-                sanitizeObject(obj[key]);
-            }
-        }
-    };
+const sanitizeValue = (value) => {
+    if (typeof value === "string") {
+        return xss(value);
+    }
 
-    sanitizeObject(req.body);
-    sanitizeObject(req.params);
-    sanitizeObject(req.query);
+    if (Array.isArray(value)) {
+        return value.map((item) => sanitizeValue(item));
+    }
+
+    if (value && typeof value === "object") {
+        const sanitizedObject = {};
+
+        for (const key in value) {
+            sanitizedObject[key] = sanitizeValue(value[key]);
+        }
+
+        return sanitizedObject;
+    }
+
+    return value;
+};
+
+const xssSanitizer = (req, res, next) => {
+    if (req.body) {
+        req.body = sanitizeValue(req.body);
+    }
+
+    if (req.params) {
+        req.params = sanitizeValue(req.params);
+    }
+
+    if (req.query) {
+        req.sanitizedQuery = sanitizeValue(req.query);
+    }
+
     next();
 };
 

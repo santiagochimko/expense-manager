@@ -3,7 +3,11 @@
 
 const validate = (schema, property = "body") => {
     return (req, res, next) => {
-        const { error, value } = schema.validate(req[property], {
+        const source = property === "query"
+            ? req.sanitizedQuery || req.query
+            : req[property];
+
+        const { error, value } = schema.validate(source, {
             abortEarly: false,
             stripUnknown: true
         });
@@ -18,12 +22,12 @@ const validate = (schema, property = "body") => {
             });
         }
 
-        //Se guarda el valor validado y limpio en req
         if (property === "query") {
             req.validatedQuery = value;
         } else {
             req[property] = value;
         }
+
         next();
     };
 };
