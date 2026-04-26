@@ -69,10 +69,6 @@ Formato exacto de respuesta:
     try {
         const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
-        console.log("GEMINI MODEL:", model);
-        console.log("GEMINI API KEY EXISTS:", Boolean(process.env.GEMINI_API_KEY));
-        console.log("CATEGORIES FOR AI:", categoriesForAI);
-
         const response = await ai.models.generateContent({
             model,
             contents: prompt,
@@ -84,22 +80,17 @@ Formato exacto de respuesta:
 
         const text = response.text;
 
-        console.log("GEMINI TEXT:", text);
-
         if (!text) {
             return fallbackSuggestion("La IA no devolvió una respuesta válida");
         }
 
         const suggestion = extractJsonFromText(text);
 
-        console.log("GEMINI PARSED SUGGESTION:", suggestion);
-
         const selectedCategory = categories.find((category) => {
             return category._id.toString() === suggestion.suggestedCategoryId;
         });
 
         if (!selectedCategory) {
-            console.log("INVALID CATEGORY FROM AI:", suggestion.suggestedCategoryId);
             return fallbackSuggestion("La IA no devolvió una categoría existente");
         }
 
@@ -110,8 +101,6 @@ Formato exacto de respuesta:
             reason: suggestion.reason || "Categoría sugerida según los datos del gasto"
         };
     } catch (error) {
-        console.log("AI SERVICE ERROR:", error.message);
-
         return fallbackSuggestion();
     }
 };
