@@ -9,15 +9,27 @@ import {
 } from "../utils/cache.js";
 
 export const createCategory = async (data, userId) => {
+    const existingCategory = await Category.findOne({
+        user: userId,
+        name: { $regex: `^${data.name}$`, $options: "i" },
+        isActive: true
+    });
+
+    if (existingCategory) {
+        throw createError("Ya existe una categoría activa con ese nombre", 409);
+    }
+
     const category = await Category.create({
         ...data,
         user: userId
     });
 
     await deleteCache(`categories:user:${userId}`);
+    await deleteCache(`dashboard:summary:${userId}`);
+    await deleteCache(`dashboard:charts:${userId}`);
 
     return category;
-}
+};
 
 export const getCategoriesByUser = async (userId) => {
     const cacheKey = `categories:user:${userId}`;
@@ -61,6 +73,19 @@ export const getCategoryById = async (categoryId, userId) => {
 };
 
 export const updateCategory = async (categoryId, userId, data) => {
+    if (data.name) {
+        const existingCategory = await Category.findOne({
+            _id: { $ne: categoryId },
+            user: userId,
+            name: { $regex: `^${data.name}$`, $options: "i" },
+            isActive: true
+        });
+
+        if (existingCategory) {
+            throw createError("Ya existe una categoría activa con ese nombre", 409);
+        }
+    }
+
     const category = await Category.findOneAndUpdate(
         {
             _id: categoryId,
@@ -85,7 +110,7 @@ export const updateCategory = async (categoryId, userId, data) => {
     await deleteCache(`dashboard:charts:${userId}`);
 
     return category;
-}
+};
 
 export const deleteCategory = async (categoryId, userId) => {
     const category = await Category.findOneAndUpdate(
