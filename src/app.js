@@ -25,17 +25,6 @@ app.use(express.json());
 
 app.use(xssSanitizer);
 //Rutas de la API
-
-const healthResponse = (req, res) => {
-    res.status(200).json({
-        message: "Expense Manager API funcionando",
-        docs: "/api/v1"
-    });
-};
-
-app.get("/", healthResponse);
-app.get("/api", healthResponse);
-app.get("/api/index.js", healthResponse);
 //Todo queda colgado de /api y dentro se maneja el versionado
 app.use('/api', apiRoutes);
 
