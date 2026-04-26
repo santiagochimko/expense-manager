@@ -2,7 +2,11 @@ import createError from "../utils/createError.js";
 import { getCache, setCache, CACHE_TTL } from "../utils/cache.js";
 
 export const getExchangeRates = async (base = "USD") => {
-    const normalizedBase = base.toUpperCase();
+    const normalizedBase = base.toUpperCase().trim();
+
+    if (!/^[A-Z]{3}$/.test(normalizedBase)) {
+        throw createError("Moneda base inválida", 400);
+    }
 
     const cacheKey = `exchange-rates:${normalizedBase}`;
 
