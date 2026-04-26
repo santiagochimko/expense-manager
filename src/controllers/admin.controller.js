@@ -19,7 +19,7 @@ export const adminDashboard = async (req, res, next) => {
 
 export const adminUsers = async (req, res, next) => {
     try {
-        const result = await getAdminUsers(req.query);
+        const result = await getAdminUsers(req.validatedQuery);
 
         res.status(200).json({
             message: "Usuarios obtenidos correctamente",
@@ -32,7 +32,7 @@ export const adminUsers = async (req, res, next) => {
 
 export const adminExpenses = async (req, res, next) => {
     try {
-        const result = await getAdminExpenses(req.query);
+        const result = await getAdminExpenses(req.validatedQuery);
 
         res.status(200).json({
             message: "Gastos obtenidos correctamente",
