@@ -113,7 +113,7 @@ export const getAdminExpenses = async (queryParams) => {
     }
 
     if (queryParams.isActive !== undefined) {
-        filters.isActive = queryParams.isActive === "true";
+        filters.isActive = queryParams.isActive;
     }
 
     if (queryParams.search) {

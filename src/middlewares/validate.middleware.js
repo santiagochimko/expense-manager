@@ -3,12 +3,12 @@
 
 const validate = (schema, property = "body") => {
     return (req, res, next) => {
-        const {error, value} = schema.validate(req[property], {
-            abortEarly: false, 
+        const { error, value } = schema.validate(req[property], {
+            abortEarly: false,
             stripUnknown: true
         });
 
-        if(error) {
+        if (error) {
             return res.status(400).json({
                 message: "Datos inválidos",
                 errors: error.details.map((detail) => ({
@@ -19,7 +19,11 @@ const validate = (schema, property = "body") => {
         }
 
         //Se guarda el valor validado y limpio en req
-        req[property] = value;
+        if (property === "query") {
+            req.validatedQuery = value;
+        } else {
+            req[property] = value;
+        }
         next();
     };
 };

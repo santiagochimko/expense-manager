@@ -339,7 +339,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -415,7 +415,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -460,7 +460,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -504,7 +504,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -547,7 +547,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -591,7 +591,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -634,7 +634,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -682,7 +682,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -727,7 +727,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -772,7 +772,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -828,7 +828,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -871,7 +871,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -924,7 +924,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -970,7 +970,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1012,7 +1012,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1049,7 +1049,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1118,7 +1118,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1166,7 +1166,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1208,7 +1208,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token_admin}}",
+                "value": "Bearer {{token_admin}}",
                 "type": "text"
               }
             ],
@@ -1245,7 +1245,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1257,6 +1257,187 @@
               "path": [
                 "admin",
                 "dashboard"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GlobalExpenses",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Devuelve gastos globales paginados\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json).to.have.property(\"page\");\r",
+                  "    pm.expect(json).to.have.property(\"limit\");\r",
+                  "    pm.expect(json).to.have.property(\"total\");\r",
+                  "    pm.expect(json).to.have.property(\"totalPages\");\r",
+                  "    pm.expect(json.data).to.be.an(\"array\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/expenses?page=1&limit=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "expenses"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GlobalExpenses w/Limit",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Devuelve gastos globales filtrados\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json).to.have.property(\"page\");\r",
+                  "    pm.expect(json).to.have.property(\"limit\");\r",
+                  "    pm.expect(json).to.have.property(\"total\");\r",
+                  "    pm.expect(json).to.have.property(\"totalPages\");\r",
+                  "    pm.expect(json.data).to.be.an(\"array\");\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/expenses?isActive=true&search=mc",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "expenses"
+              ],
+              "query": [
+                {
+                  "key": "isActive",
+                  "value": "true"
+                },
+                {
+                  "key": "search",
+                  "value": "mc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Users",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Devuelve usuarios paginados sin password\", function () {\r",
+                  "    const json = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(json).to.have.property(\"page\");\r",
+                  "    pm.expect(json).to.have.property(\"limit\");\r",
+                  "    pm.expect(json).to.have.property(\"total\");\r",
+                  "    pm.expect(json).to.have.property(\"totalPages\");\r",
+                  "    pm.expect(json.data).to.be.an(\"array\");\r",
+                  "\r",
+                  "    if (json.data.length > 0) {\r",
+                  "        pm.expect(json.data[0]).to.not.have.property(\"password\");\r",
+                  "    }\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/users?page=1&limit=10",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
               ]
             }
           },
@@ -1690,7 +1871,7 @@
         "header": [
           {
             "key": "Authorization",
-            "value": "Bearer{{token}}",
+            "value": "Bearer {{token}}",
             "type": "text"
           }
         ],

@@ -12,7 +12,14 @@ const authMiddleware = (req, res, next) => {
         }
 
         //Espero un formato "Bearer token"
-        const token = authHeader.replace("Bearer", "");
+        const [type, token] = authHeader.split(" ");
+
+        if (type !== "Bearer" || !token) {
+            return res.status(401).json({
+                message: "Formato de token inválido"
+            });
+        }
+        
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         //Guardo usuario decodificado para usarlo en rutas protegidas
