@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "411a35cd-a18d-4bda-a262-1c5a8f9bca77",
+    "_postman_id": "6bc54b2b-bfd5-463e-97e5-25f23a3b3d6a",
     "name": "Expenses-Manager",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "18004381"
@@ -16,18 +16,15 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status 201\", function () {\r",
-                  "    pm.response.to.have.status(201);\r",
-                  "});\r",
-                  "\r",
-                  "const response = pm.response.json();\r",
-                  "\r",
-                  "pm.collectionVariables.set(\"token\", response.data.token);\r",
-                  "pm.collectionVariables.set(\"user_id\", response.data.user.id);\r",
-                  "\r",
-                  "pm.test(\"Token recibido\", function () {\r",
-                  "    pm.expect(response.data.token).to.be.a(\"string\");\r",
-                  "});"
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const response = pm.response.json();",
+                  "pm.test(\"Devuelve usuario y token\", function () {",
+                  "    pm.expect(response.data).to.have.property(\"user\");",
+                  "    pm.expect(response.data).to.have.property(\"token\");",
+                  "    pm.expect(response.data.user).to.have.property(\"id\");",
+                  "});",
+                  "pm.collectionVariables.set(\"token\", response.data.token);",
+                  "pm.collectionVariables.set(\"user_id\", response.data.user.id);"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -67,17 +64,14 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status 201\", function () {\r",
-                  "    pm.response.to.have.status(201);\r",
-                  "});\r",
-                  "\r",
-                  "const response = pm.response.json();\r",
-                  "\r",
-                  "pm.collectionVariables.set(\"token_admin\", response.data.token);\r",
-                  "\r",
-                  "pm.test(\"Token admin recibido\", function () {\r",
-                  "    pm.expect(response.data.token).to.be.a(\"string\");\r",
-                  "});"
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const response = pm.response.json();",
+                  "pm.test(\"Devuelve admin y token\", function () {",
+                  "    pm.expect(response.data).to.have.property(\"user\");",
+                  "    pm.expect(response.data).to.have.property(\"token\");",
+                  "    pm.expect(response.data.user.role).to.eql(\"admin\");",
+                  "});",
+                  "pm.collectionVariables.set(\"token_admin\", response.data.token);"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -112,6 +106,19 @@
         },
         {
           "name": "Register Invalid",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
@@ -139,6 +146,19 @@
         },
         {
           "name": "Register Duplicate",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
@@ -171,9 +191,14 @@
               "listen": "test",
               "script": {
                 "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
                   "const response = pm.response.json();",
-                  "pm.environment.set(\"token\", response.data.token);",
-                  "pm.environment.set(\"user_id\", response.data.user.id);"
+                  "pm.test(\"Devuelve usuario y token\", function () {",
+                  "    pm.expect(response.data).to.have.property(\"user\");",
+                  "    pm.expect(response.data).to.have.property(\"token\");",
+                  "});",
+                  "pm.collectionVariables.set(\"token\", response.data.token);",
+                  "pm.collectionVariables.set(\"user_id\", response.data.user.id);"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -213,9 +238,9 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const response = pm.response.json();\r",
-                  "\r",
-                  "pm.environment.set(\"token_admin\", response.data.token);"
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const response = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_admin\", response.data.token);"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -250,6 +275,19 @@
         },
         {
           "name": "Invalid Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [],
@@ -277,6 +315,25 @@
         },
         {
           "name": "Authenticated User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve usuario autenticado\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json.data).to.have.property(\"id\");",
+                  "    pm.expect(json.data).to.have.property(\"username\");",
+                  "    pm.expect(json.data).to.have.property(\"plan\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -301,6 +358,19 @@
         },
         {
           "name": "Unauthenticated User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -329,9 +399,10 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const response = pm.response.json();\r",
-                  "\r",
-                  "pm.environment.set(\"category_id\", response.data._id);"
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const response = pm.response.json();",
+                  "pm.collectionVariables.set(\"category_id\", response.data._id);",
+                  "pm.test(\"Categoría creada\", function () { pm.expect(response.data).to.have.property(\"_id\"); });"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -371,6 +442,19 @@
         },
         {
           "name": "Invalid Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -397,7 +481,21 @@
           "response": []
         },
         {
-          "name": "Category",
+          "name": "Get Categories",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve array\", function () { pm.expect(pm.response.json().data).to.be.an(\"array\"); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -428,6 +526,19 @@
         },
         {
           "name": "Category by Id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -459,6 +570,19 @@
         },
         {
           "name": "NonExistent Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -587,9 +711,10 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "const response = pm.response.json();\r",
-                  "\r",
-                  "pm.environment.set(\"expense_id\", response.data._id);"
+                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "const response = pm.response.json();",
+                  "pm.collectionVariables.set(\"expense_id\", response.data._id);",
+                  "pm.test(\"Gasto creado\", function () { pm.expect(response.data).to.have.property(\"_id\"); });"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -629,6 +754,19 @@
         },
         {
           "name": "Invalid Expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "POST",
             "header": [
@@ -660,7 +798,28 @@
           "response": []
         },
         {
-          "name": "Expenses",
+          "name": "Get Expenses",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve paginado y data\", function () {",
+                  "    const json = pm.response.json();",
+                  "    pm.expect(json).to.have.property(\"page\");",
+                  "    pm.expect(json).to.have.property(\"limit\");",
+                  "    pm.expect(json).to.have.property(\"total\");",
+                  "    pm.expect(json).to.have.property(\"totalPages\");",
+                  "    pm.expect(json.data).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -691,6 +850,19 @@
         },
         {
           "name": "Expenses with Pag",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -731,6 +903,19 @@
         },
         {
           "name": "Expenses with Search",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "protocolProfileBehavior": {
             "disableBodyPruning": true
           },
@@ -767,6 +952,19 @@
         },
         {
           "name": "Expenses by catID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -796,6 +994,19 @@
         },
         {
           "name": "Expense by id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -820,6 +1031,19 @@
         },
         {
           "name": "NonExistent Expense",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404\", function () { pm.response.to.have.status(404); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -844,6 +1068,19 @@
         },
         {
           "name": "Expenses No Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [],
@@ -953,6 +1190,19 @@
       "item": [
         {
           "name": "Dashboard Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -977,6 +1227,19 @@
         },
         {
           "name": "Dashboard Admin UserToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
             "method": "GET",
             "header": [
@@ -998,11 +1261,36 @@
             }
           },
           "response": []
-        },
+        }
+      ]
+    },
+    {
+      "name": "Dashboard",
+      "item": [
         {
-          "name": "Upgrade to Premium",
+          "name": "Dashboard Summary",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve resumen\", function () {",
+                  " const json = pm.response.json();",
+                  " pm.expect(json.data).to.have.property(\"plan\");",
+                  " pm.expect(json.data).to.have.property(\"totalExpenses\");",
+                  " pm.expect(json.data).to.have.property(\"totalAmount\");",
+                  " pm.expect(json.data).to.have.property(\"currentMonthAmount\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
           "request": {
-            "method": "PATCH",
+            "method": "GET",
             "header": [
               {
                 "key": "Authorization",
@@ -1010,9 +1298,239 @@
                 "type": "text"
               }
             ],
+            "url": {
+              "raw": "{{BASE_URL}}/dashboard/summary",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "summary"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dashboard Charts",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve gráficos\", function () {",
+                  " const json = pm.response.json();",
+                  " pm.expect(json.data.expensesByCategory).to.be.an(\"array\");",
+                  " pm.expect(json.data.expensesByPaymentMethod).to.be.an(\"array\");",
+                  " pm.expect(json.data.expensesByMonth).to.be.an(\"array\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/dashboard/charts",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "dashboard",
+                "charts"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Exchange Rates",
+      "item": [
+        {
+          "name": "Exchange Rates USD",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve USD\", function () { const json=pm.response.json(); pm.expect(json.data.base).to.eql(\"USD\"); pm.expect(json.data.rates).to.be.an(\"object\"); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/exchange-rates?base=USD",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "exchange-rates"
+              ],
+              "query": [
+                {
+                  "key": "base",
+                  "value": "USD"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange Rates EUR",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve EUR\", function () { const json=pm.response.json(); pm.expect(json.data.base).to.eql(\"EUR\"); pm.expect(json.data.rates).to.be.an(\"object\"); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/exchange-rates?base=EUR",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "exchange-rates"
+              ],
+              "query": [
+                {
+                  "key": "base",
+                  "value": "EUR"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Exchange Rates Invalid Base",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/exchange-rates?base=USDD",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "exchange-rates"
+              ],
+              "query": [
+                {
+                  "key": "base",
+                  "value": "USDD"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "AI",
+      "item": [
+        {
+          "name": "Suggest Category - Fast Food",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve estructura sugerencia IA\", function () {",
+                  " const json=pm.response.json();",
+                  " pm.expect(json.data).to.have.property(\"suggestedCategoryId\");",
+                  " pm.expect(json.data).to.have.property(\"suggestedCategoryName\");",
+                  " pm.expect(json.data).to.have.property(\"confidence\");",
+                  " pm.expect(json.data).to.have.property(\"reason\");",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n \"plan\": \"premium\"\r\n}",
+              "raw": "{\n  \"title\": \"McDonald's\",\n  \"description\": \"Combo grande con bebida\",\n  \"amount\": 420\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1020,14 +1538,116 @@
               }
             },
             "url": {
-              "raw": "{{BASE_URL}}/users/me/plan",
+              "raw": "{{BASE_URL}}/ai/suggest-category",
               "host": [
                 "{{BASE_URL}}"
               ],
               "path": [
-                "users",
-                "me",
-                "plan"
+                "ai",
+                "suggest-category"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suggest Category - Health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "pm.test(\"Devuelve estructura sugerencia IA\", function () { const json=pm.response.json(); pm.expect(json.data).to.have.property(\"reason\"); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Farmacia\",\n  \"description\": \"Compra de medicamentos\",\n  \"amount\": 850\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ai/suggest-category",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ai",
+                "suggest-category"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suggest Category Invalid Body",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer{{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"A\",\n  \"amount\": -1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ai/suggest-category",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ai",
+                "suggest-category"
               ]
             }
           },
@@ -1044,6 +1664,54 @@
           "raw": "{{BASE_URL}}",
           "host": [
             "{{BASE_URL}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Upgrade to Premium",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Plan premium\", function () { pm.expect(pm.response.json().data.plan).to.eql(\"premium\"); });"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer{{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n \"plan\": \"premium\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{BASE_URL}}/users/me/plan",
+          "host": [
+            "{{BASE_URL}}"
+          ],
+          "path": [
+            "users",
+            "me",
+            "plan"
           ]
         }
       },
@@ -1081,6 +1749,22 @@
     },
     {
       "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "token_admin",
+      "value": ""
+    },
+    {
+      "key": "category_id",
+      "value": ""
+    },
+    {
+      "key": "expense_id",
       "value": ""
     }
   ]
