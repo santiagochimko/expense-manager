@@ -8,13 +8,22 @@ dotenv.config();
 let isConnected = false;
 
 const handler = async (req, res) => {
-    if (!isConnected) {
-        await connectDB();
-        await connectRedis();
-        isConnected = true;
-    }
+    try {
+        if (!isConnected) {
+            await connectDB();
+            await connectRedis();
+            isConnected = true;
+        }
 
-    return app(req, res);
+        return app(req, res);
+    } catch (error) {
+        console.error("Error inicializando servicios:", error.message);
+
+        return res.status(500).json({
+            message: "Error inicializando servicios",
+            error: error.message
+        });
+    }
 };
 
 export default handler;
