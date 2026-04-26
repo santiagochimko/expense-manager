@@ -3,15 +3,27 @@ import cors from 'cors';
 import apiRoutes from './routes/index.js';
 import notfound from './middlewares/notFound.middleware.js';
 import errorHandler from './middlewares/error.middleware.js';
+import xssSanitizer from './middlewares/sanitizer-middleware.mjs';
 
 const app = express();
+
+//CORS para permitir futuras llamadas desde el frontend
+const corsOptions = {
+    origin: [
+        "http://localhost:3000",
+        //"https://tu-frontend.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true, // solo si usás cookies/sesión
+};
+
+app.use(cors(corsOptions));
 
 //Middleware para permitir JSON en el body de las request
 app.use(express.json());
 
-//CORS para permitir futuras llamadas desde el frontend
-app.use(cors());
-
+app.use(xssSanitizer);
 //Rutas de la API
 //Todo queda colgado de /api y dentro se maneja el versionado
 app.use('/api', apiRoutes);
