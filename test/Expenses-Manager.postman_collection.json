@@ -1,11 +1,69 @@
 {
   "info": {
-    "_postman_id": "6bc54b2b-bfd5-463e-97e5-25f23a3b3d6a",
+    "_postman_id": "514ea409-e6a6-43df-9578-3d619b0ff7bd",
     "name": "Expenses-Manager",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "18004381"
   },
   "item": [
+    {
+      "name": "Setup Random Data",
+      "item": [
+        {
+          "name": "Setup Random Data",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const runId = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"run_id\", runId);\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"random_user_username\", `user_${runId}`);\r",
+                  "pm.collectionVariables.set(\"random_user_email\", `user_${runId}@example.com`);\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"random_admin_username\", `admin_${runId}`);\r",
+                  "pm.collectionVariables.set(\"random_admin_email\", `admin_${runId}@example.com`);\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"random_category_name\", `Categoria_${runId}`);\r",
+                  "pm.collectionVariables.set(\"random_category_duplicate_name\", `Categoria_${runId}`);\r",
+                  "pm.collectionVariables.set(\"random_category_updated_name\", `Categoria_Editada_${runId}`);\r",
+                  "\r",
+                  "pm.collectionVariables.set(\"random_expense_title\", `Gasto_${runId}`);\r",
+                  "\r",
+                  "pm.collectionVariables.unset(\"token\");\r",
+                  "pm.collectionVariables.unset(\"token_admin\");\r",
+                  "pm.collectionVariables.unset(\"user_id\");\r",
+                  "pm.collectionVariables.unset(\"category_id\");\r",
+                  "pm.collectionVariables.unset(\"expense_id\");\r",
+                  "\r",
+                  "pm.test(\"Datos random generados\", function () {\r",
+                  "    pm.expect(pm.collectionVariables.get(\"run_id\")).to.eql(runId);\r",
+                  "    pm.expect(pm.collectionVariables.get(\"random_user_username\")).to.eql(`user_${runId}`);\r",
+                  "    pm.expect(pm.collectionVariables.get(\"random_user_email\")).to.eql(`user_${runId}@example.com`);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}",
+              "host": [
+                "{{BASE_URL}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
     {
       "name": "Login/Register",
       "item": [
@@ -16,15 +74,34 @@
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm.test(\"Status 201\", function () { pm.response.to.have.status(201); });",
+                  "pm.test(\"Status 201\", function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
                   "const response = pm.response.json();",
+                  "",
                   "pm.test(\"Devuelve usuario y token\", function () {",
                   "    pm.expect(response.data).to.have.property(\"user\");",
                   "    pm.expect(response.data).to.have.property(\"token\");",
+                  "    pm.expect(response.data.token).to.be.a(\"string\");",
+                  "    pm.expect(response.data.token).to.match(/^eyJ/);",
                   "    pm.expect(response.data.user).to.have.property(\"id\");",
                   "});",
+                  "",
                   "pm.collectionVariables.set(\"token\", response.data.token);",
                   "pm.collectionVariables.set(\"user_id\", response.data.user.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "pm.collectionVariables.unset(\"token\");\r",
+                  "pm.collectionVariables.unset(\"user_id\");"
                 ],
                 "type": "text/javascript",
                 "packages": {},
@@ -37,7 +114,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"diego_user\",\r\n    \"email\": \"diego_user@example.com\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"user\"\r\n}",
+              "raw": "{\r\n    \"username\": \"{{random_user_username}}\",\r\n    \"email\": \"{{random_user_email}}\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"user\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -84,7 +161,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"santiago_admin\",\r\n    \"email\": \"santiago_admin@example.com\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"admin\"\r\n}",
+              "raw": "{\r\n    \"username\": \"{{random_admin_username}}\",\r\n    \"email\": \"{{random_admin_email}}\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"admin\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -164,7 +241,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"santiago_user\",\r\n    \"email\": \"santiago_user@example.com\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"user\"\r\n}",
+              "raw": "{\r\n    \"username\": \"{{random_user_username}}\",\r\n    \"email\": \"duplicado_{{run_id}}@example.com\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"user\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -211,7 +288,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"santiago_user\",\r\n    \"password\": \"123456\"\r\n}",
+              "raw": "{\r\n    \"username\": \"{{random_user_username}}\",\r\n    \"password\": \"123456\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -253,7 +330,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"santiago_admin\",\r\n    \"password\": \"123456\"\r\n}",
+              "raw": "{\r\n    \"username\": \"{{random_admin_username}}\",\r\n    \"password\": \"123456\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -408,6 +485,21 @@
                 "packages": {},
                 "requests": {}
               }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "const token = pm.collectionVariables.get(\"token\");\r",
+                  "\r",
+                  "if (!token || !token.startsWith(\"eyJ\")) {\r",
+                  "    throw new Error(\"No hay token de usuario válido. Ejecutá Register o Login User antes de Create Category.\");\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
             }
           ],
           "request": {
@@ -421,7 +513,57 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n  \"name\": \"Veterinaria\",\r\n  \"description\": \"Gastos relacionados a veterinaria\",\r\n  \"color\": \"#FF5733\"\r\n}",
+              "raw": "{\r\n  \"name\": \"{{random_category_name}}\",\r\n  \"description\": \"Categoría generada automáticamente\",\r\n  \"color\": \"#FF5733\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/categories",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Duplicate Category",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 409\", function () { pm.response.to.have.status(409); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{random_category_duplicate_name}}\",\r\n  \"description\": \"Categoría duplicada\",\r\n  \"color\": \"#FF5733\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -613,7 +755,7 @@
           "response": []
         },
         {
-          "name": "Category",
+          "name": "Update Category",
           "event": [
             {
               "listen": "test",
@@ -640,7 +782,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n \"name\": \"Comidas y salidas\",\r\n \"description\": \"Gastos en comida y restaurantes\",\r\n \"color\": \"#E63946\"\r\n}",
+              "raw": "{\r\n \"name\": \"{{random_category_updated_name}}\",\r\n \"description\": \"Categoría actualizada automáticamente\",\r\n \"color\": \"#E63946\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -661,7 +803,7 @@
           "response": []
         },
         {
-          "name": "Category",
+          "name": "Delete Category",
           "event": [
             {
               "listen": "test",
@@ -733,7 +875,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n \"title\": \"McDonald's\",\r\n \"description\": \"Combo grande\",\r\n \"amount\": 350,\r\n \"date\": \"2026-03-29\",\r\n \"paymentMethod\": \"cash\",\r\n \"category\": \"{{category_id}}\"\r\n}",
+              "raw": "{\r\n \"title\": \"{{random_expense_title}}\",\r\n \"description\": \"Gasto generado automáticamente\",\r\n \"amount\": 350,\r\n \"date\": \"2026-03-29\",\r\n \"paymentMethod\": \"cash\",\r\n \"category\": \"{{category_id}}\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -933,7 +1075,7 @@
               "raw": ""
             },
             "url": {
-              "raw": "{{BASE_URL}}/expenses?search=mc",
+              "raw": "{{BASE_URL}}/expenses?search={{random_expense_title}}",
               "host": [
                 "{{BASE_URL}}"
               ],
@@ -943,7 +1085,7 @@
               "query": [
                 {
                   "key": "search",
-                  "value": "mc"
+                  "value": "{{random_expense_title}}"
                 }
               ]
             }
@@ -1097,7 +1239,7 @@
           "response": []
         },
         {
-          "name": "Expense",
+          "name": "Update Expense",
           "event": [
             {
               "listen": "test",
@@ -1124,7 +1266,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n \"title\": \"McDonald's Pocitos\",\r\n \"description\": \"Combo grande con bebida\",\r\n \"amount\": 420,\r\n \"paymentMethod\": \"debit_card\"\r\n}",
+              "raw": "{\r\n \"title\": \"{{random_expense_title}} actualizado\",\r\n \"description\": \"Gasto actualizado automáticamente\",\r\n \"amount\": 420,\r\n \"paymentMethod\": \"debit_card\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1145,7 +1287,7 @@
           "response": []
         },
         {
-          "name": "Expense",
+          "name": "Delete Expense",
           "event": [
             {
               "listen": "test",
@@ -1442,6 +1584,49 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Users Invalid Role",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/admin/users?role=superadmin",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "admin",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "role",
+                  "value": "superadmin"
+                }
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1475,7 +1660,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1518,7 +1703,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1561,7 +1746,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1604,7 +1789,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1646,7 +1831,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               }
             ],
@@ -1700,7 +1885,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               },
               {
@@ -1752,7 +1937,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               },
               {
@@ -1803,7 +1988,7 @@
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer{{token}}",
+                "value": "Bearer {{token}}",
                 "type": "text"
               },
               {
@@ -1925,14 +2110,6 @@
   ],
   "variable": [
     {
-      "key": "token",
-      "value": ""
-    },
-    {
-      "key": "user_id",
-      "value": ""
-    },
-    {
       "key": "BASE_URL",
       "value": "http://localhost:3000/api/v1"
     },
@@ -1950,10 +2127,54 @@
     },
     {
       "key": "PROD_BASE_URL",
-      "value": ""
+      "value": "https://expense-manager-backend-7gw2hqasf-santiagochimkos-projects.vercel.app/api/v1"
     },
     {
       "key": "BASE_URL_LOCAL",
+      "value": "http://localhost:3000/api/v1"
+    },
+    {
+      "key": "run_id",
+      "value": ""
+    },
+    {
+      "key": "random_user_username",
+      "value": ""
+    },
+    {
+      "key": "random_user_email",
+      "value": ""
+    },
+    {
+      "key": "random_admin_username",
+      "value": ""
+    },
+    {
+      "key": "random_admin_email",
+      "value": ""
+    },
+    {
+      "key": "random_category_name",
+      "value": ""
+    },
+    {
+      "key": "random_category_duplicate_name",
+      "value": ""
+    },
+    {
+      "key": "random_category_updated_name",
+      "value": ""
+    },
+    {
+      "key": "random_expense_title",
+      "value": ""
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "user_id",
       "value": ""
     }
   ]
