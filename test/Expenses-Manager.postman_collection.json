@@ -1859,6 +1859,70 @@
       "name": "AI",
       "item": [
         {
+          "name": "Create AI Category - Fast Food",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Comida Rápida\",\r\n  \"description\": \"Gastos relacionados a comida rápida\",\r\n  \"color\": \"#FF5733\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/categories",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create AI Category - Health",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Salud\",\r\n  \"description\": \"Gastos relacionados a salud\",\r\n  \"color\": \"#2A9D8F\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/categories",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "categories"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Suggest Category - Fast Food",
           "event": [
             {
@@ -2114,18 +2178,6 @@
       "value": "http://localhost:3000/api/v1"
     },
     {
-      "key": "token_admin",
-      "value": ""
-    },
-    {
-      "key": "category_id",
-      "value": ""
-    },
-    {
-      "key": "expense_id",
-      "value": ""
-    },
-    {
       "key": "PROD_BASE_URL",
       "value": "https://expense-manager-backend-7gw2hqasf-santiagochimkos-projects.vercel.app/api/v1"
     },
@@ -2175,6 +2227,18 @@
     },
     {
       "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "category_id",
+      "value": ""
+    },
+    {
+      "key": "token_admin",
+      "value": ""
+    },
+    {
+      "key": "expense_id",
       "value": ""
     }
   ]
