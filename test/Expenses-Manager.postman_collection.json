@@ -114,7 +114,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"{{random_user_username}}\",\r\n    \"email\": \"{{random_user_email}}\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"user\"\r\n}",
+              "raw": "{\r\n    \"username\": \"{{random_user_username}}\",\r\n    \"email\": \"{{random_user_email}}\",\r\n    \"password\": \"123456\",\r\n    \"confirmPassword\": \"123456\",\r\n    \"role\": \"user\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -161,7 +161,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"{{random_admin_username}}\",\r\n    \"email\": \"{{random_admin_email}}\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"admin\"\r\n}",
+              "raw": "{\r\n    \"username\": \"{{random_admin_username}}\",\r\n    \"email\": \"{{random_admin_email}}\",\r\n    \"password\": \"123456\",\r\n    \"confirmPassword\": \"123456\",\r\n    \"role\": \"admin\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -201,7 +201,47 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"\",\r\n    \"email\": \"correo-mal\",\r\n    \"password\": \"12\",\r\n    \"role\": \"otro\"\r\n}",
+              "raw": "{\r\n    \"username\": \"\",\r\n    \"email\": \"correo-mal\",\r\n    \"password\": \"12\",    \r\n    \"role\": \"otro\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/register",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Register MisMatch Psw",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"password_mismatch_test\",\r\n    \"email\": \"password_mismatch_test@example.com\",\r\n    \"password\": \"123456\",\r\n    \"confirmPassword\": \"654321\",\r\n    \"role\": \"otro\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
