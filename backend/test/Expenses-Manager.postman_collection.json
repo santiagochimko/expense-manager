@@ -281,7 +281,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"username\": \"{{random_user_username}}\",\r\n    \"email\": \"duplicado_{{run_id}}@example.com\",\r\n    \"password\": \"123456\",\r\n    \"role\": \"user\"\r\n}",
+              "raw": "{\r\n    \"username\": \"{{random_user_username}}\",\r\n    \"email\": \"duplicado_{{run_id}}@example.com\",\r\n    \"password\": \"123456\",\r\n    \"confirmPassword\": \"123456\",\r\n    \"role\": \"user\"\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
