@@ -1,6 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 
 import AppLayout from "../components/layout/AppLayout.jsx";
+import ProtectedRoute from "../components/shared/ProtectedRoute.jsx";
+import AdminRoute from "../components/shared/AdminRoute.jsx";
 
 import LoginPage from "../pages/LoginPage.jsx";
 import RegisterPage from "../pages/RegisterPage.jsx";
@@ -20,17 +22,21 @@ const AppRoutes = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        <Route path="/" element={<AppLayout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<AppLayout />}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
 
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="categories" element={<CategoriesPage />} />
-          <Route path="expenses" element={<ExpensesPage />} />
-          <Route path="exchange-rates" element={<ExchangeRatesPage />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="categories" element={<CategoriesPage />} />
+            <Route path="expenses" element={<ExpensesPage />} />
+            <Route path="exchange-rates" element={<ExchangeRatesPage />} />
 
-          <Route path="admin/dashboard" element={<AdminDashboardPage />} />
-          <Route path="admin/users" element={<AdminUsersPage />} />
-          <Route path="admin/expenses" element={<AdminExpensesPage />} />
+            <Route element={<AdminRoute />}>
+              <Route path="admin/dashboard" element={<AdminDashboardPage />} />
+              <Route path="admin/users" element={<AdminUsersPage />} />
+              <Route path="admin/expenses" element={<AdminExpensesPage />} />
+            </Route>
+          </Route>
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
