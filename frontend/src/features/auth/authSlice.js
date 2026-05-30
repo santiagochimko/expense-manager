@@ -6,12 +6,14 @@ import {
   registerUser
 } from "./authThunks.js";
 
+const storedToken = getStoredToken();
+
 const initialState = {
   user: null,
-  token: getStoredToken(),
-  isAuthenticated: Boolean(getStoredToken()),
+  token: storedToken,
+  isAuthenticated: Boolean(storedToken),
   loading: false,
-  initialized: false,
+  initialized: !storedToken,
   error: null,
   validationErrors: []
 };
@@ -26,6 +28,7 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.initialized = true;
       state.error = null;
       state.validationErrors = [];
     },

@@ -3,6 +3,10 @@ import { getStoredToken } from "../utils/storage.js";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export const apiRequest = async (endpoint, options = {}) => {
+  if (!API_URL) {
+    throw new Error("Falta configurar VITE_API_URL en el archivo .env");
+  }
+
   const token = getStoredToken();
 
   const response = await fetch(`${API_URL}${endpoint}`, {
