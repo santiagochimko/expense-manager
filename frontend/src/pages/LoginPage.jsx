@@ -10,17 +10,16 @@ import {
   Paper,
   Stack,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 
 import { loginUser } from "../features/auth/authThunks.js";
-import {
-  clearAuthError
-} from "../features/auth/authSlice.js";
+import { clearAuthError } from "../features/auth/authSlice.js";
 import {
   selectAuthError,
   selectAuthLoading,
-  selectIsAuthenticated
+  selectIsAuthenticated,
+  selectUser,
 } from "../features/auth/authSelectors.js";
 
 const LoginPage = () => {
@@ -30,13 +29,15 @@ const LoginPage = () => {
   const loading = useSelector(selectAuthLoading);
   const error = useSelector(selectAuthError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
-
+  const user = useSelector(selectUser);
+  
   const [formData, setFormData] = useState({
     username: "",
-    password: ""
+    password: "",
   });
 
-  const isFormValid = formData.username.trim() !== "" && formData.password !== "";
+  const isFormValid =
+    formData.username.trim() !== "" && formData.password !== "";
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -45,7 +46,7 @@ const LoginPage = () => {
 
     setFormData((currentData) => ({
       ...currentData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -59,12 +60,22 @@ const LoginPage = () => {
     const result = await dispatch(loginUser(formData));
 
     if (loginUser.fulfilled.match(result)) {
-      navigate("/dashboard", { replace: true });
+      const loggedUser = result.payload.user;
+
+      navigate(
+        loggedUser.role === "admin" ? "/admin/dashboard" : "/dashboard",
+        { replace: true },
+      );
     }
   };
 
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+  if (isAuthenticated && user) {
+    return (
+      <Navigate
+        to={user.role === "admin" ? "/admin/dashboard" : "/dashboard"}
+        replace
+      />
+    );
   }
 
   return (

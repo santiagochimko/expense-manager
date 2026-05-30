@@ -8,13 +8,13 @@ import {
   Container,
   Stack,
   Toolbar,
-  Typography
+  Typography,
 } from "@mui/material";
 
 import { logout } from "../../features/auth/authSlice.js";
 import {
   selectIsAdmin,
-  selectUser
+  selectUser,
 } from "../../features/auth/authSelectors.js";
 
 const AppLayout = () => {
@@ -39,43 +39,27 @@ const AppLayout = () => {
               display: "flex",
               alignItems: "center",
               justifyContent: "space-between",
-              gap: 2
+              gap: 2,
             }}
           >
             <Typography
               component={RouterLink}
-              to="/dashboard"
+              to={isAdmin ? "/admin/dashboard" : "/dashboard"}
               variant="h6"
               color="text.primary"
               sx={{
                 textDecoration: "none",
-                fontWeight: 700
+                fontWeight: 700,
               }}
             >
               Expense Manager
             </Typography>
 
             <Stack direction="row" spacing={1} alignItems="center">
-              <Button component={RouterLink} to="/dashboard">
-                Dashboard
-              </Button>
-
-              <Button component={RouterLink} to="/categories">
-                Categorías
-              </Button>
-
-              <Button component={RouterLink} to="/expenses">
-                Gastos
-              </Button>
-
-              <Button component={RouterLink} to="/exchange-rates">
-                Tipo de cambio
-              </Button>
-
-              {isAdmin && (
+              {isAdmin ? (
                 <>
                   <Button component={RouterLink} to="/admin/dashboard">
-                    Admin
+                    Dashboard admin
                   </Button>
 
                   <Button component={RouterLink} to="/admin/users">
@@ -84,6 +68,24 @@ const AppLayout = () => {
 
                   <Button component={RouterLink} to="/admin/expenses">
                     Gastos globales
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button component={RouterLink} to="/dashboard">
+                    Dashboard
+                  </Button>
+
+                  <Button component={RouterLink} to="/categories">
+                    Categorías
+                  </Button>
+
+                  <Button component={RouterLink} to="/expenses">
+                    Gastos
+                  </Button>
+
+                  <Button component={RouterLink} to="/exchange-rates">
+                    Tipo de cambio
                   </Button>
                 </>
               )}

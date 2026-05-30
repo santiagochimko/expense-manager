@@ -15,7 +15,7 @@ import {
   Select,
   Stack,
   TextField,
-  Typography
+  Typography,
 } from "@mui/material";
 
 import { registerUser } from "../features/auth/authThunks.js";
@@ -24,7 +24,8 @@ import {
   selectAuthError,
   selectAuthLoading,
   selectAuthValidationErrors,
-  selectIsAuthenticated
+  selectIsAuthenticated,
+  selectUser,
 } from "../features/auth/authSelectors.js";
 
 const RegisterPage = () => {
@@ -35,13 +36,14 @@ const RegisterPage = () => {
   const error = useSelector(selectAuthError);
   const validationErrors = useSelector(selectAuthValidationErrors);
   const isAuthenticated = useSelector(selectIsAuthenticated);
+  const user = useSelector(selectUser);
 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
-    role: "user"
+    role: "user",
   });
 
   const fieldErrors = useMemo(() => {
@@ -76,7 +78,7 @@ const RegisterPage = () => {
 
     setFormData((currentData) => ({
       ...currentData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -90,12 +92,22 @@ const RegisterPage = () => {
     const result = await dispatch(registerUser(formData));
 
     if (registerUser.fulfilled.match(result)) {
-      navigate("/dashboard", { replace: true });
+      const registeredUser = result.payload.user;
+
+      navigate(
+        registeredUser.role === "admin" ? "/admin/dashboard" : "/dashboard",
+        { replace: true },
+      );
     }
   };
 
-  if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+  if (isAuthenticated && user) {
+    return (
+      <Navigate
+        to={user.role === "admin" ? "/admin/dashboard" : "/dashboard"}
+        replace
+      />
+    );
   }
 
   return (
