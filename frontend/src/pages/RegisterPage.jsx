@@ -6,8 +6,13 @@ import {
   Box,
   Button,
   Container,
+  FormControl,
+  FormHelperText,
+  InputLabel,
   Link,
+  MenuItem,
   Paper,
+  Select,
   Stack,
   TextField,
   Typography
@@ -35,7 +40,8 @@ const RegisterPage = () => {
     username: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    role: "user"
   });
 
   const fieldErrors = useMemo(() => {
@@ -54,12 +60,14 @@ const RegisterPage = () => {
   const confirmPasswordIsValid =
     formData.confirmPassword !== "" &&
     formData.confirmPassword === formData.password;
+  const roleIsValid = formData.role === "user" || formData.role === "admin";
 
   const isFormValid =
     usernameIsValid &&
     emailIsValid &&
     passwordIsValid &&
-    confirmPasswordIsValid;
+    confirmPasswordIsValid &&
+    roleIsValid;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -130,6 +138,26 @@ const RegisterPage = () => {
                 error={Boolean(fieldErrors.email)}
                 helperText={fieldErrors.email || "Ingresá un email válido"}
               />
+
+              <FormControl fullWidth required error={Boolean(fieldErrors.role)}>
+                <InputLabel id="role-label">Tipo de usuario</InputLabel>
+
+                <Select
+                  labelId="role-label"
+                  label="Tipo de usuario"
+                  name="role"
+                  value={formData.role}
+                  onChange={handleChange}
+                >
+                  <MenuItem value="user">Usuario</MenuItem>
+                  <MenuItem value="admin">Administrador</MenuItem>
+                </Select>
+
+                <FormHelperText>
+                  {fieldErrors.role ||
+                    "Seleccioná el tipo de usuario para el registro"}
+                </FormHelperText>
+              </FormControl>
 
               <TextField
                 label="Contraseña"
