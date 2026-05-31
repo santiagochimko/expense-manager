@@ -12,7 +12,13 @@ export const fetchExpenses = createAsyncThunk(
     try {
       const response = await getExpensesRequest(filters);
 
-      return response.data;
+      return {
+        page: response.page,
+        limit: response.limit,
+        total: response.total,
+        totalPages: response.totalPages,
+        data: response.data || []
+      };
     } catch (error) {
       return rejectWithValue({
         message: error.message,

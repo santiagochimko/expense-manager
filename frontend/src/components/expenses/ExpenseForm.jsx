@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   Box,
   Button,
   FormControl,
@@ -8,7 +9,7 @@ import {
   MenuItem,
   Select,
   Stack,
-  TextField,
+  TextField
 } from "@mui/material";
 
 const getTodayDate = () => {
@@ -29,7 +30,7 @@ const getInitialFormData = (selectedExpense) => {
         typeof selectedExpense.category === "object"
           ? selectedExpense.category._id
           : selectedExpense.category || "",
-      receiptImageUrl: selectedExpense.receiptImageUrl || "",
+      receiptImageUrl: selectedExpense.receiptImageUrl || ""
     };
   }
 
@@ -40,7 +41,7 @@ const getInitialFormData = (selectedExpense) => {
     date: getTodayDate(),
     paymentMethod: "cash",
     category: "",
-    receiptImageUrl: "",
+    receiptImageUrl: ""
   };
 };
 
@@ -59,11 +60,15 @@ const ExpenseForm = ({
   categories,
   validationErrors = [],
   saving,
+  aiLoading,
+  aiError,
+  aiSuggestion,
   onSubmit,
   onCancel,
+  onSuggestCategory
 }) => {
   const [formData, setFormData] = useState(() =>
-    getInitialFormData(selectedExpense),
+    getInitialFormData(selectedExpense)
   );
 
   const fieldErrors = getFieldErrors(validationErrors);
@@ -76,13 +81,35 @@ const ExpenseForm = ({
   const isFormValid =
     titleIsValid && amountIsValid && dateIsValid && categoryIsValid;
 
+  const canSuggestCategory =
+    formData.title.trim().length >= 2 && !aiLoading && !selectedExpense;
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
     setFormData((currentData) => ({
       ...currentData,
-      [name]: value,
+      [name]: value
     }));
+  };
+
+  const handleSuggestCategory = async () => {
+    if (!canSuggestCategory || !onSuggestCategory) {
+      return;
+    }
+
+    const suggestion = await onSuggestCategory({
+      title: formData.title.trim(),
+      description: formData.description.trim(),
+      amount: Number(formData.amount) || 0
+    });
+
+    if (suggestion?.suggestedCategoryId) {
+      setFormData((currentData) => ({
+        ...currentData,
+        category: suggestion.suggestedCategoryId
+      }));
+    }
   };
 
   const handleSubmit = (event) => {
@@ -98,7 +125,7 @@ const ExpenseForm = ({
       amount: Number(formData.amount),
       date: formData.date,
       paymentMethod: formData.paymentMethod,
-      category: formData.category,
+      category: formData.category
     };
 
     if (formData.receiptImageUrl.trim() !== "") {
@@ -133,6 +160,26 @@ const ExpenseForm = ({
           error={Boolean(fieldErrors.description)}
           helperText={fieldErrors.description || "Detalle opcional del gasto"}
         />
+
+        {!selectedExpense && (
+          <Button
+            type="button"
+            variant="outlined"
+            disabled={!canSuggestCategory}
+            onClick={handleSuggestCategory}
+          >
+            {aiLoading ? "Sugiriendo..." : "Sugerir categoría con IA"}
+          </Button>
+        )}
+
+        {aiError && <Alert severity="warning">{aiError}</Alert>}
+
+        {aiSuggestion?.suggestedCategoryName && (
+          <Alert severity="success">
+            Categoría sugerida: {aiSuggestion.suggestedCategoryName}.{" "}
+            {aiSuggestion.reason}
+          </Alert>
+        )}
 
         <TextField
           label="Monto"
