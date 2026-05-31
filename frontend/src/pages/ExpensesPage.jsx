@@ -14,11 +14,13 @@ import ExpenseForm from "../components/expenses/ExpenseForm.jsx";
 import ExpensesFilters from "../components/expenses/ExpensesFilters.jsx";
 import ExpensesPagination from "../components/expenses/ExpensesPagination.jsx";
 import ExpensesTable from "../components/expenses/ExpensesTable.jsx";
+
 import { fetchCategories } from "../features/categories/categoriesThunks.js";
 import {
   selectCategories,
   selectCategoriesLoading,
 } from "../features/categories/categoriesSelectors.js";
+
 import {
   clearExpensesError,
   setExpenseFilters,
@@ -43,6 +45,14 @@ import {
   selectExpensesValidationErrors,
 } from "../features/expenses/expensesSelectors.js";
 
+import { suggestCategory } from "../features/ai/aiThunks.js";
+import {
+  selectAiError,
+  selectAiLoading,
+  selectAiSuggestion,
+} from "../features/ai/aiSelectors.js";
+import { clearAiSuggestion } from "../features/ai/aiSlice.js";
+
 const ExpensesPage = () => {
   const dispatch = useDispatch();
 
@@ -60,6 +70,10 @@ const ExpensesPage = () => {
   const total = useSelector(selectExpensesTotal);
   const totalPages = useSelector(selectExpensesTotalPages);
 
+  const aiLoading = useSelector(selectAiLoading);
+  const aiError = useSelector(selectAiError);
+  const aiSuggestion = useSelector(selectAiSuggestion);
+
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [localFilters, setLocalFilters] = useState({
     search: "",
@@ -74,13 +88,25 @@ const ExpensesPage = () => {
     dispatch(fetchExpenses(filters));
   }, [dispatch, filters]);
 
+  const handleSuggestCategory = async (expenseData) => {
+    dispatch(clearAiSuggestion());
+
+    const result = await dispatch(suggestCategory(expenseData));
+
+    if (suggestCategory.fulfilled.match(result)) {
+      return result.payload;
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (expenseData) => {
     const result = selectedExpense
       ? await dispatch(
           updateExpense({
             expenseId: selectedExpense._id,
             expenseData,
-          }),
+          })
         )
       : await dispatch(createExpense(expenseData));
 
@@ -90,23 +116,26 @@ const ExpensesPage = () => {
     ) {
       setSelectedExpense(null);
       dispatch(clearExpensesError());
+      dispatch(clearAiSuggestion());
       dispatch(fetchExpenses(filters));
     }
   };
 
   const handleEdit = (expense) => {
     dispatch(clearExpensesError());
+    dispatch(clearAiSuggestion());
     setSelectedExpense(expense);
   };
 
   const handleCancelEdit = () => {
     dispatch(clearExpensesError());
+    dispatch(clearAiSuggestion());
     setSelectedExpense(null);
   };
 
   const handleDelete = async (expenseId) => {
     const confirmDelete = window.confirm(
-      "¿Seguro que querés eliminar este gasto?",
+      "¿Seguro que querés eliminar este gasto?"
     );
 
     if (!confirmDelete) {
@@ -212,8 +241,12 @@ const ExpensesPage = () => {
               categories={categories}
               validationErrors={validationErrors}
               saving={saving}
+              aiLoading={aiLoading}
+              aiError={aiError}
+              aiSuggestion={aiSuggestion}
               onSubmit={handleSubmit}
               onCancel={handleCancelEdit}
+              onSuggestCategory={handleSuggestCategory}
             />
           )}
         </Paper>

@@ -154,8 +154,8 @@ const DashboardPage = () => {
           title={summary?.plan === "plus" ? "Gastos restantes" : "Plan"}
           value={
             summary?.plan === "plus"
-              ? (summary?.remaining ?? 0)
-              : (summary?.plan ?? "-")
+              ? summary?.remaining ?? 0
+              : summary?.plan ?? "-"
           }
           helperText={
             summary?.plan === "plus"
@@ -179,8 +179,8 @@ const DashboardPage = () => {
           {categoryChartData.length === 0 ? (
             <EmptyChartState />
           ) : (
-            <Box sx={{ height: 320 }}>
-              <ResponsiveContainer width="100%" height="100%">
+            <Box sx={{ width: "100%", height: 320, minWidth: 0 }}>
+              <ResponsiveContainer width="100%" height={320}>
                 <BarChart data={categoryChartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
@@ -197,8 +197,8 @@ const DashboardPage = () => {
           {monthlyChartData.length === 0 ? (
             <EmptyChartState />
           ) : (
-            <Box sx={{ height: 320 }}>
-              <ResponsiveContainer width="100%" height="100%">
+            <Box sx={{ width: "100%", height: 320, minWidth: 0 }}>
+              <ResponsiveContainer width="100%" height={320}>
                 <LineChart data={monthlyChartData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
@@ -221,8 +221,8 @@ const DashboardPage = () => {
         {paymentMethodChartData.length === 0 ? (
           <EmptyChartState />
         ) : (
-          <Box sx={{ height: 320 }}>
-            <ResponsiveContainer width="100%" height="100%">
+          <Box sx={{ width: "100%", height: 320, minWidth: 0 }}>
+            <ResponsiveContainer width="100%" height={320}>
               <BarChart data={paymentMethodChartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />

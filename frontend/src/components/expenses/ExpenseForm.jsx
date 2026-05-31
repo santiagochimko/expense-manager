@@ -9,8 +9,14 @@ import {
   MenuItem,
   Select,
   Stack,
-  TextField
+  TextField,
 } from "@mui/material";
+
+const confidenceLabels = {
+  low: "baja",
+  medium: "media",
+  high: "alta",
+};
 
 const getTodayDate = () => {
   return new Date().toISOString().slice(0, 10);
@@ -30,7 +36,7 @@ const getInitialFormData = (selectedExpense) => {
         typeof selectedExpense.category === "object"
           ? selectedExpense.category._id
           : selectedExpense.category || "",
-      receiptImageUrl: selectedExpense.receiptImageUrl || ""
+      receiptImageUrl: selectedExpense.receiptImageUrl || "",
     };
   }
 
@@ -41,7 +47,7 @@ const getInitialFormData = (selectedExpense) => {
     date: getTodayDate(),
     paymentMethod: "cash",
     category: "",
-    receiptImageUrl: ""
+    receiptImageUrl: "",
   };
 };
 
@@ -57,7 +63,7 @@ const getFieldErrors = (validationErrors) => {
 
 const ExpenseForm = ({
   selectedExpense,
-  categories,
+  categories = [],
   validationErrors = [],
   saving,
   aiLoading,
@@ -65,7 +71,7 @@ const ExpenseForm = ({
   aiSuggestion,
   onSubmit,
   onCancel,
-  onSuggestCategory
+  onSuggestCategory,
 }) => {
   const [formData, setFormData] = useState(() =>
     getInitialFormData(selectedExpense)
@@ -82,14 +88,17 @@ const ExpenseForm = ({
     titleIsValid && amountIsValid && dateIsValid && categoryIsValid;
 
   const canSuggestCategory =
-    formData.title.trim().length >= 2 && !aiLoading && !selectedExpense;
+    formData.title.trim().length >= 2 &&
+    Number(formData.amount) > 0 &&
+    !aiLoading &&
+    !selectedExpense;
 
   const handleChange = (event) => {
     const { name, value } = event.target;
 
     setFormData((currentData) => ({
       ...currentData,
-      [name]: value
+      [name]: value,
     }));
   };
 
@@ -101,13 +110,13 @@ const ExpenseForm = ({
     const suggestion = await onSuggestCategory({
       title: formData.title.trim(),
       description: formData.description.trim(),
-      amount: Number(formData.amount) || 0
+      amount: Number(formData.amount),
     });
 
     if (suggestion?.suggestedCategoryId) {
       setFormData((currentData) => ({
         ...currentData,
-        category: suggestion.suggestedCategoryId
+        category: suggestion.suggestedCategoryId,
       }));
     }
   };
@@ -125,7 +134,7 @@ const ExpenseForm = ({
       amount: Number(formData.amount),
       date: formData.date,
       paymentMethod: formData.paymentMethod,
-      category: formData.category
+      category: formData.category,
     };
 
     if (formData.receiptImageUrl.trim() !== "") {
@@ -161,6 +170,18 @@ const ExpenseForm = ({
           helperText={fieldErrors.description || "Detalle opcional del gasto"}
         />
 
+        <TextField
+          label="Monto"
+          name="amount"
+          type="number"
+          value={formData.amount}
+          onChange={handleChange}
+          fullWidth
+          required
+          error={Boolean(fieldErrors.amount)}
+          helperText={fieldErrors.amount || "Debe ser mayor a 0"}
+        />
+
         {!selectedExpense && (
           <Button
             type="button"
@@ -176,22 +197,24 @@ const ExpenseForm = ({
 
         {aiSuggestion?.suggestedCategoryName && (
           <Alert severity="success">
-            Categoría sugerida: {aiSuggestion.suggestedCategoryName}.{" "}
-            {aiSuggestion.reason}
+            Categoría sugerida: {aiSuggestion.suggestedCategoryName}. Confianza:{" "}
+            {confidenceLabels[aiSuggestion.confidence] ||
+              aiSuggestion.confidence}
+            . {aiSuggestion.reason}
           </Alert>
         )}
 
-        <TextField
-          label="Monto"
-          name="amount"
-          type="number"
-          value={formData.amount}
-          onChange={handleChange}
-          fullWidth
-          required
-          error={Boolean(fieldErrors.amount)}
-          helperText={fieldErrors.amount || "Debe ser mayor a 0"}
-        />
+        {aiSuggestion &&
+          !aiSuggestion.suggestedCategoryId &&
+          !aiSuggestion.suggestedCategoryName && (
+            <Alert severity="info">
+              No se encontró una categoría sugerida. Confianza:{" "}
+              {confidenceLabels[aiSuggestion.confidence] ||
+                aiSuggestion.confidence ||
+                "baja"}
+              . {aiSuggestion.reason}
+            </Alert>
+          )}
 
         <TextField
           label="Fecha"
@@ -201,7 +224,11 @@ const ExpenseForm = ({
           onChange={handleChange}
           fullWidth
           required
-          InputLabelProps={{ shrink: true }}
+          slotProps={{
+            inputLabel: {
+              shrink: true,
+            },
+          }}
           error={Boolean(fieldErrors.date)}
           helperText={fieldErrors.date || "Fecha del gasto"}
         />
@@ -258,7 +285,12 @@ const ExpenseForm = ({
           }
         />
 
-        <Stack direction="row" spacing={1}>
+        <Box
+          sx={{
+            display: "flex",
+            gap: 1,
+          }}
+        >
           <Button
             type="submit"
             variant="contained"
@@ -276,7 +308,7 @@ const ExpenseForm = ({
               Cancelar edición
             </Button>
           )}
-        </Stack>
+        </Box>
       </Stack>
     </Box>
   );

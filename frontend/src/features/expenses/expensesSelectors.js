@@ -1,12 +1,14 @@
 export const selectExpenses = (state) => state.expenses.items || [];
 
 export const selectExpensesFilters = (state) => {
-    return state.expenses.filters || {
-        search: "",
-        category: "",
-        page: 1,
-        limit: 10
-    };
+  return (
+    state.expenses.filters || {
+      search: "",
+      category: "",
+      page: 1,
+      limit: 10,
+    }
+  );
 };
 
 export const selectExpensesLoading = (state) => state.expenses.loading;
@@ -18,7 +20,7 @@ export const selectExpensesDeleting = (state) => state.expenses.deleting;
 export const selectExpensesError = (state) => state.expenses.error;
 
 export const selectExpensesValidationErrors = (state) => {
-    return state.expenses.validationErrors;
+  return state.expenses.validationErrors;
 };
 
 export const selectExpensesPage = (state) => state.expenses.page;

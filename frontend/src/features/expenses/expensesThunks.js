@@ -3,7 +3,7 @@ import {
   createExpenseRequest,
   deleteExpenseRequest,
   getExpensesRequest,
-  updateExpenseRequest
+  updateExpenseRequest,
 } from "../../api/expenses.api.js";
 
 export const fetchExpenses = createAsyncThunk(
@@ -17,12 +17,12 @@ export const fetchExpenses = createAsyncThunk(
         limit: response.limit,
         total: response.total,
         totalPages: response.totalPages,
-        data: response.data || []
+        data: response.data || [],
       };
     } catch (error) {
       return rejectWithValue({
         message: error.message,
-        errors: error.errors || []
+        errors: error.errors || [],
       });
     }
   }
@@ -38,7 +38,7 @@ export const createExpense = createAsyncThunk(
     } catch (error) {
       return rejectWithValue({
         message: error.message,
-        errors: error.errors || []
+        errors: error.errors || [],
       });
     }
   }
@@ -54,7 +54,7 @@ export const updateExpense = createAsyncThunk(
     } catch (error) {
       return rejectWithValue({
         message: error.message,
-        errors: error.errors || []
+        errors: error.errors || [],
       });
     }
   }
@@ -70,7 +70,7 @@ export const deleteExpense = createAsyncThunk(
     } catch (error) {
       return rejectWithValue({
         message: error.message,
-        errors: error.errors || []
+        errors: error.errors || [],
       });
     }
   }
