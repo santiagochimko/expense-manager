@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -22,6 +22,16 @@ const getInitialFormData = (selectedCategory) => {
   };
 };
 
+const getFieldErrors = (validationErrors) => {
+  const errors = {};
+
+  validationErrors.forEach((item) => {
+    errors[item.field] = item.message;
+  });
+
+  return errors;
+};
+
 const CategoryForm = ({
   selectedCategory,
   validationErrors = [],
@@ -33,15 +43,7 @@ const CategoryForm = ({
     getInitialFormData(selectedCategory)
   );
 
-  const fieldErrors = useMemo(() => {
-    const errors = {};
-
-    validationErrors.forEach((item) => {
-      errors[item.field] = item.message;
-    });
-
-    return errors;
-  }, [validationErrors]);
+  const fieldErrors = getFieldErrors(validationErrors);
 
   const nameIsValid = formData.name.trim().length >= 2;
   const colorIsValid = /^#[0-9A-Fa-f]{6}$/.test(formData.color);

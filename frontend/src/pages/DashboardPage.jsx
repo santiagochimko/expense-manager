@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Alert,
@@ -8,7 +8,7 @@ import {
   Grid,
   Paper,
   Stack,
-  Typography
+  Typography,
 } from "@mui/material";
 import {
   Bar,
@@ -19,7 +19,7 @@ import {
   ResponsiveContainer,
   Tooltip,
   XAxis,
-  YAxis
+  YAxis,
 } from "recharts";
 
 import SummaryCard from "../components/dashboard/SummaryCard.jsx";
@@ -29,12 +29,42 @@ import {
   selectDashboardCharts,
   selectDashboardError,
   selectDashboardLoading,
-  selectDashboardSummary
+  selectDashboardSummary,
 } from "../features/dashboard/dashboardSelectors.js";
 import {
   fetchDashboardCharts,
-  fetchDashboardSummary
+  fetchDashboardSummary,
 } from "../features/dashboard/dashboardThunks.js";
+
+const getCategoryChartData = (charts) => {
+  const expensesByCategory = charts?.expensesByCategory || [];
+
+  return expensesByCategory.map((item) => ({
+    name: item.categoryName || "Sin categoría",
+    amount: item.totalAmount,
+    count: item.totalCount,
+  }));
+};
+
+const getMonthlyChartData = (charts) => {
+  const expensesByMonth = charts?.expensesByMonth || [];
+
+  return expensesByMonth.map((item) => ({
+    name: `${item._id.month}/${item._id.year}`,
+    amount: item.totalAmount,
+    count: item.totalCount,
+  }));
+};
+
+const getPaymentMethodChartData = (charts) => {
+  const expensesByPaymentMethod = charts?.expensesByPaymentMethod || [];
+
+  return expensesByPaymentMethod.map((item) => ({
+    name: item._id || "Sin método",
+    amount: item.totalAmount,
+    count: item.totalCount,
+  }));
+};
 
 const DashboardPage = () => {
   const dispatch = useDispatch();
@@ -49,35 +79,9 @@ const DashboardPage = () => {
     dispatch(fetchDashboardCharts());
   }, [dispatch]);
 
-  const categoryChartData = useMemo(() => {
-    const expensesByCategory = charts?.expensesByCategory || [];
-
-    return expensesByCategory.map((item) => ({
-      name: item.categoryName || "Sin categoría",
-      amount: item.totalAmount,
-      count: item.totalCount
-    }));
-  }, [charts]);
-
-  const monthlyChartData = useMemo(() => {
-    const expensesByMonth = charts?.expensesByMonth || [];
-
-    return expensesByMonth.map((item) => ({
-      name: `${item._id.month}/${item._id.year}`,
-      amount: item.totalAmount,
-      count: item.totalCount
-    }));
-  }, [charts]);
-
-  const paymentMethodChartData = useMemo(() => {
-    const expensesByPaymentMethod = charts?.expensesByPaymentMethod || [];
-
-    return expensesByPaymentMethod.map((item) => ({
-      name: item._id || "Sin método",
-      amount: item.totalAmount,
-      count: item.totalCount
-    }));
-  }, [charts]);
+  const categoryChartData = getCategoryChartData(charts);
+  const monthlyChartData = getMonthlyChartData(charts);
+  const paymentMethodChartData = getPaymentMethodChartData(charts);
 
   const handleReload = () => {
     dispatch(fetchDashboardSummary());
@@ -99,7 +103,7 @@ const DashboardPage = () => {
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          gap: 2
+          gap: 2,
         }}
       >
         <Box>
@@ -149,8 +153,8 @@ const DashboardPage = () => {
             title={summary?.plan === "plus" ? "Gastos restantes" : "Plan"}
             value={
               summary?.plan === "plus"
-                ? summary?.remaining ?? 0
-                : summary?.plan ?? "-"
+                ? (summary?.remaining ?? 0)
+                : (summary?.plan ?? "-")
             }
             helperText={
               summary?.plan === "plus"
