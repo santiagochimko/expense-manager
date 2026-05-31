@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Grid,
   Paper,
   Stack,
   Typography
@@ -34,7 +33,7 @@ import {
 const CategoriesPage = () => {
   const dispatch = useDispatch();
 
-  const categories = useSelector(selectCategories);
+  const categories = useSelector(selectCategories) || [];
   const loading = useSelector(selectCategoriesLoading);
   const saving = useSelector(selectCategoriesSaving);
   const deleting = useSelector(selectCategoriesDeleting);
@@ -131,32 +130,38 @@ const CategoriesPage = () => {
 
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Grid container spacing={3}>
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" component="h2" gutterBottom>
-              {selectedCategory ? "Editar categoría" : "Nueva categoría"}
-            </Typography>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "minmax(280px, 420px) 1fr"
+          },
+          gap: 3
+        }}
+      >
+        <Paper sx={{ p: 3 }}>
+          <Typography variant="h6" component="h2" gutterBottom>
+            {selectedCategory ? "Editar categoría" : "Nueva categoría"}
+          </Typography>
 
-            <CategoryForm
-              selectedCategory={selectedCategory}
-              validationErrors={validationErrors}
-              saving={saving}
-              onSubmit={handleSubmit}
-              onCancel={handleCancelEdit}
-            />
-          </Paper>
-        </Grid>
-
-        <Grid item xs={12} md={8}>
-          <CategoriesTable
-            categories={categories}
-            deleting={deleting}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+          <CategoryForm
+            key={selectedCategory?._id || "new-category"}
+            selectedCategory={selectedCategory}
+            validationErrors={validationErrors}
+            saving={saving}
+            onSubmit={handleSubmit}
+            onCancel={handleCancelEdit}
           />
-        </Grid>
-      </Grid>
+        </Paper>
+
+        <CategoriesTable
+          categories={categories}
+          deleting={deleting}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </Box>
     </Stack>
   );
 };
