@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Grid,
   Paper,
   Stack,
   Typography,
@@ -123,114 +122,118 @@ const DashboardPage = () => {
 
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={3}>
-          <SummaryCard
-            title="Total de gastos"
-            value={summary?.totalExpenses ?? 0}
-            helperText="Cantidad de gastos registrados"
-          />
-        </Grid>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "repeat(4, 1fr)",
+          },
+          gap: 2,
+        }}
+      >
+        <SummaryCard
+          title="Total de gastos"
+          value={summary?.totalExpenses ?? 0}
+          helperText="Cantidad de gastos registrados"
+        />
 
-        <Grid item xs={12} md={3}>
-          <SummaryCard
-            title="Monto total"
-            value={`$${summary?.totalAmount ?? 0}`}
-            helperText="Suma total acumulada"
-          />
-        </Grid>
+        <SummaryCard
+          title="Monto total"
+          value={`$${summary?.totalAmount ?? 0}`}
+          helperText="Suma total acumulada"
+        />
 
-        <Grid item xs={12} md={3}>
-          <SummaryCard
-            title="Monto del mes"
-            value={`$${summary?.currentMonthAmount ?? 0}`}
-            helperText="Total gastado este mes"
-          />
-        </Grid>
+        <SummaryCard
+          title="Monto del mes"
+          value={`$${summary?.currentMonthAmount ?? 0}`}
+          helperText="Total gastado este mes"
+        />
 
-        <Grid item xs={12} md={3}>
-          <SummaryCard
-            title={summary?.plan === "plus" ? "Gastos restantes" : "Plan"}
-            value={
-              summary?.plan === "plus"
-                ? (summary?.remaining ?? 0)
-                : (summary?.plan ?? "-")
-            }
-            helperText={
-              summary?.plan === "plus"
-                ? "Disponibles antes de llegar al límite"
-                : "Plan actual del usuario"
-            }
-          />
-        </Grid>
-      </Grid>
+        <SummaryCard
+          title={summary?.plan === "plus" ? "Gastos restantes" : "Plan"}
+          value={
+            summary?.plan === "plus"
+              ? (summary?.remaining ?? 0)
+              : (summary?.plan ?? "-")
+          }
+          helperText={
+            summary?.plan === "plus"
+              ? "Disponibles antes de llegar al límite"
+              : "Plan actual del usuario"
+          }
+        />
+      </Box>
 
-      <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <DashboardChartCard title="Gastos por categoría">
-            {categoryChartData.length === 0 ? (
-              <EmptyChartState />
-            ) : (
-              <Box sx={{ height: 320 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryChartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="amount" name="Monto" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            )}
-          </DashboardChartCard>
-        </Grid>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: {
+            xs: "1fr",
+            md: "1fr 1fr",
+          },
+          gap: 2,
+        }}
+      >
+        <DashboardChartCard title="Gastos por categoría">
+          {categoryChartData.length === 0 ? (
+            <EmptyChartState />
+          ) : (
+            <Box sx={{ height: 320 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={categoryChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Bar dataKey="amount" name="Monto" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Box>
+          )}
+        </DashboardChartCard>
 
-        <Grid item xs={12} md={6}>
-          <DashboardChartCard title="Evolución mensual">
-            {monthlyChartData.length === 0 ? (
-              <EmptyChartState />
-            ) : (
-              <Box sx={{ height: 320 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={monthlyChartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Line
-                      type="monotone"
-                      dataKey="amount"
-                      name="Monto"
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </Box>
-            )}
-          </DashboardChartCard>
-        </Grid>
+        <DashboardChartCard title="Evolución mensual">
+          {monthlyChartData.length === 0 ? (
+            <EmptyChartState />
+          ) : (
+            <Box sx={{ height: 320 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={monthlyChartData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line
+                    type="monotone"
+                    dataKey="amount"
+                    name="Monto"
+                    strokeWidth={2}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </Box>
+          )}
+        </DashboardChartCard>
+      </Box>
 
-        <Grid item xs={12}>
-          <DashboardChartCard title="Gastos por método de pago">
-            {paymentMethodChartData.length === 0 ? (
-              <EmptyChartState />
-            ) : (
-              <Box sx={{ height: 320 }}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={paymentMethodChartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="amount" name="Monto" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            )}
-          </DashboardChartCard>
-        </Grid>
-      </Grid>
+      <DashboardChartCard title="Gastos por método de pago">
+        {paymentMethodChartData.length === 0 ? (
+          <EmptyChartState />
+        ) : (
+          <Box sx={{ height: 320 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={paymentMethodChartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="amount" name="Monto" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Box>
+        )}
+      </DashboardChartCard>
 
       {!loading && !summary && !charts && !error && (
         <Paper sx={{ p: 3 }}>

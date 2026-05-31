@@ -3,7 +3,6 @@ import {
   Button,
   Chip,
   Paper,
-  Stack,
   Table,
   TableBody,
   TableCell,
@@ -65,7 +64,13 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
 
               <TableCell>
                 {expense.category ? (
-                  <Stack direction="row" spacing={1} alignItems="center">
+                  <Box
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1
+                    }}
+                  >
                     <Box
                       sx={{
                         width: 12,
@@ -79,7 +84,7 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                     <Typography variant="body2">
                       {expense.category.name}
                     </Typography>
-                  </Stack>
+                  </Box>
                 ) : (
                   "Sin categoría"
                 )}
@@ -100,7 +105,13 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
               <TableCell align="right">${expense.amount}</TableCell>
 
               <TableCell align="right">
-                <Stack direction="row" spacing={1} justifyContent="flex-end">
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    gap: 1
+                  }}
+                >
                   <Button
                     variant="outlined"
                     size="small"
@@ -118,7 +129,7 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                   >
                     Eliminar
                   </Button>
-                </Stack>
+                </Box>
               </TableCell>
             </TableRow>
           ))}

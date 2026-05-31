@@ -1,4 +1,4 @@
-import { Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 
 const ExpensesPagination = ({
   page,
@@ -12,11 +12,13 @@ const ExpensesPagination = ({
   }
 
   return (
-    <Stack
-      direction="row"
-      spacing={2}
-      alignItems="center"
-      justifyContent="space-between"
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 2
+      }}
     >
       <Typography color="text.secondary">
         Página {page} de {totalPages} · {total} resultados
@@ -39,7 +41,7 @@ const ExpensesPagination = ({
           Siguiente
         </Button>
       </Stack>
-    </Stack>
+    </Box>
   );
 };
 

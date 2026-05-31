@@ -7,7 +7,7 @@ import {
   CircularProgress,
   Paper,
   Stack,
-  Typography
+  Typography,
 } from "@mui/material";
 
 import ExpenseForm from "../components/expenses/ExpenseForm.jsx";
@@ -17,18 +17,18 @@ import ExpensesTable from "../components/expenses/ExpensesTable.jsx";
 import { fetchCategories } from "../features/categories/categoriesThunks.js";
 import {
   selectCategories,
-  selectCategoriesLoading
+  selectCategoriesLoading,
 } from "../features/categories/categoriesSelectors.js";
 import {
   clearExpensesError,
   setExpenseFilters,
-  setExpensePage
+  setExpensePage,
 } from "../features/expenses/expensesSlice.js";
 import {
   createExpense,
   deleteExpense,
   fetchExpenses,
-  updateExpense
+  updateExpense,
 } from "../features/expenses/expensesThunks.js";
 import {
   selectExpenses,
@@ -40,7 +40,7 @@ import {
   selectExpensesSaving,
   selectExpensesTotal,
   selectExpensesTotalPages,
-  selectExpensesValidationErrors
+  selectExpensesValidationErrors,
 } from "../features/expenses/expensesSelectors.js";
 
 const ExpensesPage = () => {
@@ -63,7 +63,7 @@ const ExpensesPage = () => {
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [localFilters, setLocalFilters] = useState({
     search: "",
-    category: ""
+    category: "",
   });
 
   useEffect(() => {
@@ -79,8 +79,8 @@ const ExpensesPage = () => {
       ? await dispatch(
           updateExpense({
             expenseId: selectedExpense._id,
-            expenseData
-          })
+            expenseData,
+          }),
         )
       : await dispatch(createExpense(expenseData));
 
@@ -106,7 +106,7 @@ const ExpensesPage = () => {
 
   const handleDelete = async (expenseId) => {
     const confirmDelete = window.confirm(
-      "¿Seguro que querés eliminar este gasto?"
+      "¿Seguro que querés eliminar este gasto?",
     );
 
     if (!confirmDelete) {
@@ -131,7 +131,7 @@ const ExpensesPage = () => {
   const handleClearFilters = () => {
     const emptyFilters = {
       search: "",
-      category: ""
+      category: "",
     };
 
     setLocalFilters(emptyFilters);
@@ -147,7 +147,7 @@ const ExpensesPage = () => {
     dispatch(fetchExpenses(filters));
   };
 
-  if ((loading || categoriesLoading) && expenses.length === 0) {
+  if (loading && expenses.length === 0) {
     return (
       <Box sx={{ display: "grid", placeItems: "center", minHeight: 300 }}>
         <CircularProgress />
@@ -162,7 +162,7 @@ const ExpensesPage = () => {
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
-          gap: 2
+          gap: 2,
         }}
       >
         <Box>
@@ -191,9 +191,9 @@ const ExpensesPage = () => {
           display: "grid",
           gridTemplateColumns: {
             xs: "1fr",
-            md: "minmax(280px, 420px) 1fr"
+            md: "minmax(280px, 420px) 1fr",
           },
-          gap: 3
+          gap: 3,
         }}
       >
         <Paper sx={{ p: 3 }}>
