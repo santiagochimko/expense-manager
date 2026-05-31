@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Link as RouterLink, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -28,6 +28,16 @@ import {
   selectUser,
 } from "../features/auth/authSelectors.js";
 
+const getFieldErrors = (validationErrors) => {
+  const errors = {};
+
+  validationErrors.forEach((item) => {
+    errors[item.field] = item.message;
+  });
+
+  return errors;
+};
+
 const RegisterPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -46,15 +56,7 @@ const RegisterPage = () => {
     role: "user",
   });
 
-  const fieldErrors = useMemo(() => {
-    const errors = {};
-
-    validationErrors.forEach((item) => {
-      errors[item.field] = item.message;
-    });
-
-    return errors;
-  }, [validationErrors]);
+  const fieldErrors = getFieldErrors(validationErrors);
 
   const usernameIsValid = formData.username.trim().length >= 3;
   const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email);
