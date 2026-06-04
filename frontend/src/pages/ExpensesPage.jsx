@@ -106,7 +106,7 @@ const ExpensesPage = () => {
           updateExpense({
             expenseId: selectedExpense._id,
             expenseData,
-          })
+          }),
         )
       : await dispatch(createExpense(expenseData));
 
@@ -135,7 +135,7 @@ const ExpensesPage = () => {
 
   const handleDelete = async (expenseId) => {
     const confirmDelete = window.confirm(
-      "¿Seguro que querés eliminar este gasto?"
+      "¿Seguro que querés eliminar este gasto?",
     );
 
     if (!confirmDelete) {
@@ -153,8 +153,8 @@ const ExpensesPage = () => {
     }
   };
 
-  const handleApplyFilters = () => {
-    dispatch(setExpenseFilters(localFilters));
+  const handleApplyFilters = (nextFilters) => {
+    dispatch(setExpenseFilters(nextFilters || localFilters));
   };
 
   const handleClearFilters = () => {

@@ -1,19 +1,29 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getStoredToken, removeStoredToken } from "../../utils/storage.js";
 import {
+  getUserFromToken,
+  isTokenExpired
+} from "../../utils/token.js";
+import {
   loadCurrentUser,
   loginUser,
   registerUser
 } from "./authThunks.js";
 
 const storedToken = getStoredToken();
+const tokenIsValid = storedToken && !isTokenExpired(storedToken);
+const userFromToken = tokenIsValid ? getUserFromToken(storedToken) : null;
+
+if (storedToken && !tokenIsValid) {
+  removeStoredToken();
+}
 
 const initialState = {
-  user: null,
-  token: storedToken,
-  isAuthenticated: Boolean(storedToken),
+  user: userFromToken,
+  token: tokenIsValid ? storedToken : null,
+  isAuthenticated: Boolean(tokenIsValid),
   loading: false,
-  initialized: !storedToken,
+  initialized: !tokenIsValid,
   error: null,
   validationErrors: []
 };

@@ -1,6 +1,7 @@
-import { useState } from "react";
 import { Link as RouterLink, Navigate, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import {
   Alert,
   Box,
@@ -22,6 +23,14 @@ import {
   selectUser,
 } from "../features/auth/authSelectors.js";
 
+const loginSchema = Yup.object({
+  username: Yup.string()
+    .trim()
+    .required("El usuario es obligatorio"),
+  password: Yup.string()
+    .required("La contraseña es obligatoria"),
+});
+
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -30,44 +39,33 @@ const LoginPage = () => {
   const error = useSelector(selectAuthError);
   const isAuthenticated = useSelector(selectIsAuthenticated);
   const user = useSelector(selectUser);
-  
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-  });
 
-  const isFormValid =
-    formData.username.trim() !== "" && formData.password !== "";
+  const formik = useFormik({
+    initialValues: {
+      username: "",
+      password: "",
+    },
+    validationSchema: loginSchema,
+    onSubmit: async (values) => {
+      dispatch(clearAuthError());
 
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    dispatch(clearAuthError());
-
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (!isFormValid) {
-      return;
-    }
-
-    const result = await dispatch(loginUser(formData));
-
-    if (loginUser.fulfilled.match(result)) {
-      const loggedUser = result.payload.user;
-
-      navigate(
-        loggedUser.role === "admin" ? "/admin/dashboard" : "/dashboard",
-        { replace: true },
+      const result = await dispatch(
+        loginUser({
+          username: values.username.trim(),
+          password: values.password,
+        })
       );
-    }
-  };
+
+      if (loginUser.fulfilled.match(result)) {
+        const loggedUser = result.payload.user;
+
+        navigate(
+          loggedUser.role === "admin" ? "/admin/dashboard" : "/dashboard",
+          { replace: true }
+        );
+      }
+    },
+  });
 
   if (isAuthenticated && user) {
     return (
@@ -94,32 +92,48 @@ const LoginPage = () => {
 
           {error && <Alert severity="error">{error}</Alert>}
 
-          <Box component="form" onSubmit={handleSubmit}>
+          <Box component="form" onSubmit={formik.handleSubmit}>
             <Stack spacing={2}>
               <TextField
                 label="Usuario"
                 name="username"
-                value={formData.username}
-                onChange={handleChange}
+                value={formik.values.username}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 fullWidth
                 required
+                error={
+                  Boolean(formik.touched.username) &&
+                  Boolean(formik.errors.username)
+                }
+                helperText={
+                  formik.touched.username ? formik.errors.username : ""
+                }
               />
 
               <TextField
                 label="Contraseña"
                 name="password"
                 type="password"
-                value={formData.password}
-                onChange={handleChange}
+                value={formik.values.password}
+                onChange={formik.handleChange}
+                onBlur={formik.handleBlur}
                 fullWidth
                 required
+                error={
+                  Boolean(formik.touched.password) &&
+                  Boolean(formik.errors.password)
+                }
+                helperText={
+                  formik.touched.password ? formik.errors.password : ""
+                }
               />
 
               <Button
                 type="submit"
                 variant="contained"
                 size="large"
-                disabled={!isFormValid || loading}
+                disabled={!formik.isValid || !formik.dirty || loading}
               >
                 {loading ? "Ingresando..." : "Ingresar"}
               </Button>

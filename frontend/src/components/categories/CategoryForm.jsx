@@ -1,35 +1,46 @@
-import { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import {
   Box,
   Button,
   Stack,
-  TextField
+  TextField,
 } from "@mui/material";
 
-const getInitialFormData = (selectedCategory) => {
+const categorySchema = Yup.object({
+  name: Yup.string()
+    .trim()
+    .min(2, "Mínimo 2 caracteres")
+    .max(50, "Máximo 50 caracteres")
+    .required("El nombre es obligatorio"),
+  description: Yup.string()
+    .trim(),
+  color: Yup.string()
+    .trim(),
+});
+
+const getInitialValues = (selectedCategory) => {
   if (selectedCategory) {
     return {
       name: selectedCategory.name || "",
       description: selectedCategory.description || "",
-      color: selectedCategory.color || "#1976d2"
+      color: selectedCategory.color || "#1976d2",
     };
   }
 
   return {
     name: "",
     description: "",
-    color: "#1976d2"
+    color: "#1976d2",
   };
 };
 
-const getFieldErrors = (validationErrors) => {
-  const errors = {};
-
-  validationErrors.forEach((item) => {
-    errors[item.field] = item.message;
+const getBackendFieldError = (validationErrors, fieldName) => {
+  const error = validationErrors.find((item) => {
+    return item.field === fieldName;
   });
 
-  return errors;
+  return error?.message || "";
 };
 
 const CategoryForm = ({
@@ -37,68 +48,60 @@ const CategoryForm = ({
   validationErrors = [],
   saving,
   onSubmit,
-  onCancel
+  onCancel,
 }) => {
-  const [formData, setFormData] = useState(() =>
-    getInitialFormData(selectedCategory)
-  );
+  const formik = useFormik({
+    initialValues: getInitialValues(selectedCategory),
+    validationSchema: categorySchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      onSubmit({
+        name: values.name.trim(),
+        description: values.description.trim(),
+        color: values.color,
+      });
+    },
+  });
 
-  const fieldErrors = getFieldErrors(validationErrors);
+  const nameError =
+    (formik.touched.name && formik.errors.name) ||
+    getBackendFieldError(validationErrors, "name");
 
-  const nameIsValid = formData.name.trim().length >= 2;
-  const colorIsValid = /^#[0-9A-Fa-f]{6}$/.test(formData.color);
+  const descriptionError =
+    (formik.touched.description && formik.errors.description) ||
+    getBackendFieldError(validationErrors, "description");
 
-  const isFormValid = nameIsValid && colorIsValid;
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    if (!isFormValid) {
-      return;
-    }
-
-    onSubmit({
-      name: formData.name.trim(),
-      description: formData.description.trim(),
-      color: formData.color
-    });
-  };
+  const colorError =
+    (formik.touched.color && formik.errors.color) ||
+    getBackendFieldError(validationErrors, "color");
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={formik.handleSubmit}>
       <Stack spacing={2}>
         <TextField
           label="Nombre"
           name="name"
-          value={formData.name}
-          onChange={handleChange}
+          value={formik.values.name}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           fullWidth
           required
-          error={Boolean(fieldErrors.name)}
-          helperText={fieldErrors.name || "Ejemplo: Supermercado"}
+          error={Boolean(nameError)}
+          helperText={nameError || "Ejemplo: Supermercado"}
         />
 
         <TextField
           label="Descripción"
           name="description"
-          value={formData.description}
-          onChange={handleChange}
+          value={formik.values.description}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           fullWidth
           multiline
           minRows={3}
-          error={Boolean(fieldErrors.description)}
+          error={Boolean(descriptionError)}
           helperText={
-            fieldErrors.description ||
-            "Breve descripción de los gastos incluidos"
+            descriptionError || "Breve descripción de los gastos incluidos"
           }
         />
 
@@ -106,19 +109,20 @@ const CategoryForm = ({
           label="Color"
           name="color"
           type="color"
-          value={formData.color}
-          onChange={handleChange}
+          value={formik.values.color}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           fullWidth
           required
-          error={Boolean(fieldErrors.color)}
-          helperText={fieldErrors.color || "Color identificador de la categoría"}
+          error={Boolean(colorError)}
+          helperText={colorError || "Color identificador de la categoría"}
         />
 
         <Stack direction="row" spacing={1}>
           <Button
             type="submit"
             variant="contained"
-            disabled={!isFormValid || saving}
+            disabled={!formik.isValid || saving}
           >
             {saving
               ? "Guardando..."

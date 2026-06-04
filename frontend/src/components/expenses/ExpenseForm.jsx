@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useFormik } from "formik";
+import * as Yup from "yup";
 import {
   Alert,
   Box,
@@ -18,11 +19,48 @@ const confidenceLabels = {
   high: "alta",
 };
 
+const paymentMethodValues = [
+  "cash",
+  "debit_card",
+  "credit_card",
+  "transfer",
+];
+
+const expenseSchema = Yup.object({
+  title: Yup.string()
+    .trim()
+    .min(2, "Mínimo 2 caracteres")
+    .max(100, "Máximo 100 caracteres")
+    .required("El título es obligatorio"),
+  description: Yup.string()
+    .trim(),
+  amount: Yup.number()
+    .typeError("El monto debe ser numérico")
+    .positive("El monto debe ser mayor a 0")
+    .required("El monto es obligatorio"),
+  date: Yup.date()
+    .typeError("La fecha debe ser válida")
+    .required("La fecha es obligatoria"),
+  paymentMethod: Yup.string()
+    .oneOf(paymentMethodValues, "Método de pago inválido"),
+  category: Yup.string()
+    .required("La categoría es obligatoria"),
+  receiptImageUrl: Yup.string()
+    .trim()
+    .test("is-url-or-empty", "Debe ser una URL válida", (value) => {
+      if (!value) {
+        return true;
+      }
+
+      return Yup.string().url().isValidSync(value);
+    }),
+});
+
 const getTodayDate = () => {
   return new Date().toISOString().slice(0, 10);
 };
 
-const getInitialFormData = (selectedExpense) => {
+const getInitialValues = (selectedExpense) => {
   if (selectedExpense) {
     return {
       title: selectedExpense.title || "",
@@ -51,14 +89,12 @@ const getInitialFormData = (selectedExpense) => {
   };
 };
 
-const getFieldErrors = (validationErrors) => {
-  const errors = {};
-
-  validationErrors.forEach((item) => {
-    errors[item.field] = item.message;
+const getBackendFieldError = (validationErrors, fieldName) => {
+  const error = validationErrors.find((item) => {
+    return item.field === fieldName;
   });
 
-  return errors;
+  return error?.message || "";
 };
 
 const ExpenseForm = ({
@@ -73,34 +109,33 @@ const ExpenseForm = ({
   onCancel,
   onSuggestCategory,
 }) => {
-  const [formData, setFormData] = useState(() =>
-    getInitialFormData(selectedExpense)
-  );
+  const formik = useFormik({
+    initialValues: getInitialValues(selectedExpense),
+    validationSchema: expenseSchema,
+    enableReinitialize: true,
+    onSubmit: (values) => {
+      const expenseData = {
+        title: values.title.trim(),
+        description: values.description.trim(),
+        amount: Number(values.amount),
+        date: values.date,
+        paymentMethod: values.paymentMethod,
+        category: values.category,
+      };
 
-  const fieldErrors = getFieldErrors(validationErrors);
+      if (values.receiptImageUrl.trim() !== "") {
+        expenseData.receiptImageUrl = values.receiptImageUrl.trim();
+      }
 
-  const titleIsValid = formData.title.trim().length >= 2;
-  const amountIsValid = Number(formData.amount) > 0;
-  const dateIsValid = formData.date !== "";
-  const categoryIsValid = formData.category !== "";
-
-  const isFormValid =
-    titleIsValid && amountIsValid && dateIsValid && categoryIsValid;
+      onSubmit(expenseData);
+    },
+  });
 
   const canSuggestCategory =
-    formData.title.trim().length >= 2 &&
-    Number(formData.amount) > 0 &&
+    formik.values.title.trim().length >= 2 &&
+    Number(formik.values.amount) > 0 &&
     !aiLoading &&
     !selectedExpense;
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-
-    setFormData((currentData) => ({
-      ...currentData,
-      [name]: value,
-    }));
-  };
 
   const handleSuggestCategory = async () => {
     if (!canSuggestCategory || !onSuggestCategory) {
@@ -108,78 +143,70 @@ const ExpenseForm = ({
     }
 
     const suggestion = await onSuggestCategory({
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      amount: Number(formData.amount),
+      title: formik.values.title.trim(),
+      description: formik.values.description.trim(),
+      amount: Number(formik.values.amount),
     });
 
     if (suggestion?.suggestedCategoryId) {
-      setFormData((currentData) => ({
-        ...currentData,
-        category: suggestion.suggestedCategoryId,
-      }));
+      formik.setFieldValue("category", suggestion.suggestedCategoryId);
     }
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-
-    if (!isFormValid) {
-      return;
-    }
-
-    const expenseData = {
-      title: formData.title.trim(),
-      description: formData.description.trim(),
-      amount: Number(formData.amount),
-      date: formData.date,
-      paymentMethod: formData.paymentMethod,
-      category: formData.category,
-    };
-
-    if (formData.receiptImageUrl.trim() !== "") {
-      expenseData.receiptImageUrl = formData.receiptImageUrl.trim();
-    }
-
-    onSubmit(expenseData);
+  const getFieldError = (fieldName) => {
+    return (
+      (formik.touched[fieldName] && formik.errors[fieldName]) ||
+      getBackendFieldError(validationErrors, fieldName)
+    );
   };
+
+  const titleError = getFieldError("title");
+  const descriptionError = getFieldError("description");
+  const amountError = getFieldError("amount");
+  const dateError = getFieldError("date");
+  const paymentMethodError = getFieldError("paymentMethod");
+  const categoryError = getFieldError("category");
+  const receiptImageUrlError = getFieldError("receiptImageUrl");
 
   return (
-    <Box component="form" onSubmit={handleSubmit}>
+    <Box component="form" onSubmit={formik.handleSubmit}>
       <Stack spacing={2}>
         <TextField
           label="Título"
           name="title"
-          value={formData.title}
-          onChange={handleChange}
+          value={formik.values.title}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           fullWidth
           required
-          error={Boolean(fieldErrors.title)}
-          helperText={fieldErrors.title || "Ejemplo: Compra supermercado"}
+          error={Boolean(titleError)}
+          helperText={titleError || "Ejemplo: Compra supermercado"}
         />
 
         <TextField
           label="Descripción"
           name="description"
-          value={formData.description}
-          onChange={handleChange}
+          value={formik.values.description}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           fullWidth
           multiline
           minRows={3}
-          error={Boolean(fieldErrors.description)}
-          helperText={fieldErrors.description || "Detalle opcional del gasto"}
+          error={Boolean(descriptionError)}
+          helperText={descriptionError || "Detalle opcional del gasto"}
         />
 
         <TextField
           label="Monto"
           name="amount"
           type="number"
-          value={formData.amount}
-          onChange={handleChange}
+          value={formik.values.amount}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           fullWidth
           required
-          error={Boolean(fieldErrors.amount)}
-          helperText={fieldErrors.amount || "Debe ser mayor a 0"}
+          error={Boolean(amountError)}
+          helperText={amountError || "Debe ser mayor a 0"}
         />
 
         {!selectedExpense && (
@@ -220,8 +247,9 @@ const ExpenseForm = ({
           label="Fecha"
           name="date"
           type="date"
-          value={formData.date}
-          onChange={handleChange}
+          value={formik.values.date}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           fullWidth
           required
           slotProps={{
@@ -229,19 +257,20 @@ const ExpenseForm = ({
               shrink: true,
             },
           }}
-          error={Boolean(fieldErrors.date)}
-          helperText={fieldErrors.date || "Fecha del gasto"}
+          error={Boolean(dateError)}
+          helperText={dateError || "Fecha del gasto"}
         />
 
-        <FormControl fullWidth required error={Boolean(fieldErrors.category)}>
+        <FormControl fullWidth required error={Boolean(categoryError)}>
           <InputLabel id="expense-category-label">Categoría</InputLabel>
 
           <Select
             labelId="expense-category-label"
             label="Categoría"
             name="category"
-            value={formData.category}
-            onChange={handleChange}
+            value={formik.values.category}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
           >
             {categories.map((category) => (
               <MenuItem key={category._id} value={category._id}>
@@ -251,36 +280,42 @@ const ExpenseForm = ({
           </Select>
 
           <FormHelperText>
-            {fieldErrors.category || "Seleccioná una categoría"}
+            {categoryError || "Seleccioná una categoría"}
           </FormHelperText>
         </FormControl>
 
-        <FormControl fullWidth>
+        <FormControl fullWidth error={Boolean(paymentMethodError)}>
           <InputLabel id="payment-method-label">Método de pago</InputLabel>
 
           <Select
             labelId="payment-method-label"
             label="Método de pago"
             name="paymentMethod"
-            value={formData.paymentMethod}
-            onChange={handleChange}
+            value={formik.values.paymentMethod}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
           >
             <MenuItem value="cash">Efectivo</MenuItem>
             <MenuItem value="debit_card">Tarjeta de débito</MenuItem>
             <MenuItem value="credit_card">Tarjeta de crédito</MenuItem>
             <MenuItem value="transfer">Transferencia</MenuItem>
           </Select>
+
+          {paymentMethodError && (
+            <FormHelperText>{paymentMethodError}</FormHelperText>
+          )}
         </FormControl>
 
         <TextField
           label="URL del comprobante"
           name="receiptImageUrl"
-          value={formData.receiptImageUrl}
-          onChange={handleChange}
+          value={formik.values.receiptImageUrl}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
           fullWidth
-          error={Boolean(fieldErrors.receiptImageUrl)}
+          error={Boolean(receiptImageUrlError)}
           helperText={
-            fieldErrors.receiptImageUrl ||
+            receiptImageUrlError ||
             "Opcional. Debe ser una URL válida si se completa"
           }
         />
@@ -294,7 +329,7 @@ const ExpenseForm = ({
           <Button
             type="submit"
             variant="contained"
-            disabled={!isFormValid || saving}
+            disabled={!formik.isValid || saving}
           >
             {saving
               ? "Guardando..."
