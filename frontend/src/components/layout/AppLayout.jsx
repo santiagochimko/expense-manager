@@ -76,14 +76,6 @@ const AppLayout = () => {
                     Dashboard
                   </Button>
 
-                  <Button component={RouterLink} to="/categories">
-                    Categorías
-                  </Button>
-
-                  <Button component={RouterLink} to="/expenses">
-                    Gastos
-                  </Button>
-
                   <Button component={RouterLink} to="/exchange-rates">
                     Tipo de cambio
                   </Button>
