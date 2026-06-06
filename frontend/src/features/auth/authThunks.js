@@ -6,6 +6,7 @@ import {
   loginRequest,
   registerRequest
 } from "../../api/auth.api.js";
+import { updateMyPlanRequest } from "../../api/users.api.js";
 import {
   removeStoredToken,
   setStoredToken
@@ -62,6 +63,22 @@ export const loadCurrentUser = createAsyncThunk(
       return rejectWithValue({
         message: error.message,
         errors: error.errors || []
+      });
+    }
+  }
+);
+
+export const updateMyPlan = createAsyncThunk(
+  "auth/updateMyPlan",
+  async (plan, { rejectWithValue }) => {
+    try {
+      const response = await updateMyPlanRequest(plan);
+
+      return response.data;
+    } catch (error) {
+      return rejectWithValue({
+        message: error.message,
+        errors: error.errors || [],
       });
     }
   }
