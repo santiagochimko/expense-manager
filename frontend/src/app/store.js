@@ -5,6 +5,7 @@ import categoriesReducer from "../features/categories/categoriesSlice.js";
 import expensesReducer from "../features/expenses/expensesSlice.js";
 import aiReducer from "../features/ai/aiSlice.js";
 import exchangeReducer from "../features/exchange/exchangeSlice.js";
+import adminReducer from "../features/admin/adminSlice.js";
 
 export const store = configureStore({
   reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
     expenses: expensesReducer,
     ai: aiReducer,
     exchange: exchangeReducer,
+    admin: adminReducer,
   }
 });
