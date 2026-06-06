@@ -125,7 +125,7 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                     color="error"
                     size="small"
                     disabled={deleting}
-                    onClick={() => onDelete(expense._id)}
+                    onClick={() => onDelete(expense)}
                   >
                     Eliminar
                   </Button>
