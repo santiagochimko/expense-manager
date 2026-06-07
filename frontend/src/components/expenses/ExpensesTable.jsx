@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -12,6 +13,8 @@ import {
   Typography,
 } from "@mui/material";
 
+import ImagePreviewDialog from "../common/ImagePreviewDialog.jsx";
+
 const paymentMethodLabels = {
   cash: "Efectivo",
   debit_card: "Débito",
@@ -24,6 +27,19 @@ const formatDate = (date) => {
 };
 
 const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
+  const [previewImage, setPreviewImage] = useState(null);
+
+  const handleOpenPreview = (expense) => {
+    setPreviewImage({
+      url: expense.receiptImageUrl,
+      title: expense.title,
+    });
+  };
+
+  const handleClosePreview = () => {
+    setPreviewImage(null);
+  };
+
   if (expenses.length === 0) {
     return (
       <Paper sx={{ p: 3 }}>
@@ -35,107 +51,155 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
   }
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Fecha</TableCell>
-            <TableCell>Título</TableCell>
-            <TableCell>Categoría</TableCell>
-            <TableCell>Método</TableCell>
-            <TableCell align="right">Monto</TableCell>
-            <TableCell align="right">Acciones</TableCell>
-          </TableRow>
-        </TableHead>
+    <>
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Fecha</TableCell>
+              <TableCell>Título</TableCell>
+              <TableCell>Categoría</TableCell>
+              <TableCell>Método</TableCell>
+              <TableCell>Comprobante</TableCell>
+              <TableCell align="right">Monto</TableCell>
+              <TableCell align="right">Acciones</TableCell>
+            </TableRow>
+          </TableHead>
 
-        <TableBody>
-          {expenses.map((expense) => (
-            <TableRow key={expense._id}>
-              <TableCell>{formatDate(expense.date)}</TableCell>
+          <TableBody>
+            {expenses.map((expense) => (
+              <TableRow key={expense._id}>
+                <TableCell>{formatDate(expense.date)}</TableCell>
 
-              <TableCell>
-                <Typography fontWeight={600}>{expense.title}</Typography>
-                {expense.description && (
-                  <Typography variant="body2" color="text.secondary">
-                    {expense.description}
-                  </Typography>
-                )}
-              </TableCell>
+                <TableCell>
+                  <Typography fontWeight={600}>{expense.title}</Typography>
+                  {expense.description && (
+                    <Typography variant="body2" color="text.secondary">
+                      {expense.description}
+                    </Typography>
+                  )}
+                </TableCell>
 
-              <TableCell>
-                {expense.category ? (
+                <TableCell>
+                  {expense.category ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: "50%",
+                          bgcolor: expense.category.color,
+                          border: "1px solid",
+                          borderColor: "divider",
+                        }}
+                      />
+
+                      <Typography variant="body2">
+                        {expense.category.name}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    "Sin categoría"
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  <Chip
+                    size="small"
+                    label={
+                      paymentMethodLabels[expense.paymentMethod] ||
+                      expense.paymentMethod ||
+                      "Sin método"
+                    }
+                    variant="outlined"
+                  />
+                </TableCell>
+
+                <TableCell>
+                  {expense.receiptImageUrl ? (
+                    <Box
+                      component="button"
+                      type="button"
+                      onClick={() => handleOpenPreview(expense)}
+                      sx={{
+                        width: 56,
+                        height: 40,
+                        p: 0,
+                        border: "1px solid",
+                        borderColor: "divider",
+                        borderRadius: 1,
+                        overflow: "hidden",
+                        cursor: "pointer",
+                        background: "transparent",
+                      }}
+                    >
+                      <Box
+                        component="img"
+                        src={expense.receiptImageUrl}
+                        alt={`Comprobante de ${expense.title}`}
+                        sx={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          display: "block",
+                        }}
+                      />
+                    </Box>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      Sin imagen
+                    </Typography>
+                  )}
+                </TableCell>
+
+                <TableCell align="right">${expense.amount}</TableCell>
+
+                <TableCell align="right">
                   <Box
                     sx={{
                       display: "flex",
-                      alignItems: "center",
-                      gap: 1
+                      justifyContent: "flex-end",
+                      gap: 1,
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        bgcolor: expense.category.color,
-                        border: "1px solid",
-                        borderColor: "divider",
-                      }}
-                    />
-                    <Typography variant="body2">
-                      {expense.category.name}
-                    </Typography>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      onClick={() => onEdit(expense)}
+                    >
+                      Editar
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="small"
+                      disabled={deleting}
+                      onClick={() => onDelete(expense)}
+                    >
+                      Eliminar
+                    </Button>
                   </Box>
-                ) : (
-                  "Sin categoría"
-                )}
-              </TableCell>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
-              <TableCell>
-                <Chip
-                  size="small"
-                  label={
-                    paymentMethodLabels[expense.paymentMethod] ||
-                    expense.paymentMethod ||
-                    "Sin método"
-                  }
-                  variant="outlined"
-                />
-              </TableCell>
-
-              <TableCell align="right">${expense.amount}</TableCell>
-
-              <TableCell align="right">
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: 1
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    size="small"
-                    onClick={() => onEdit(expense)}
-                  >
-                    Editar
-                  </Button>
-
-                  <Button
-                    variant="outlined"
-                    color="error"
-                    size="small"
-                    disabled={deleting}
-                    onClick={() => onDelete(expense)}
-                  >
-                    Eliminar
-                  </Button>
-                </Box>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+      <ImagePreviewDialog
+        open={Boolean(previewImage)}
+        imageUrl={previewImage?.url || ""}
+        title={previewImage?.title || "Comprobante"}
+        onClose={handleClosePreview}
+      />
+    </>
   );
 };
 
