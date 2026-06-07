@@ -13,7 +13,7 @@ const corsOptions = {
         "http://localhost:3000",
         "http://localhost:5173",
         "https://expense-manager-backend-delta.vercel.app/",
-        "https://expense-manager-frontend.vercel.app/",
+        "https://expense-manager-pi-beige.vercel.app/",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
