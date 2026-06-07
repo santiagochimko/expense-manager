@@ -50,11 +50,18 @@ const getMonthlyChartData = (charts) => {
   }));
 };
 
+const paymentMethodLabels = {
+  cash: "Efectivo",
+  debit_card: "Tarjeta de débito",
+  credit_card: "Tarjeta de crédito",
+  transfer: "Transferencia",
+};
+
 const getPaymentMethodChartData = (charts) => {
   const expensesByPaymentMethod = charts?.expensesByPaymentMethod || [];
 
   return expensesByPaymentMethod.map((item) => ({
-    name: item._id || "Sin método",
+    name: paymentMethodLabels[item._id] || item._id || "Sin método",
     amount: item.totalAmount,
     count: item.totalCount,
   }));
