@@ -5,7 +5,7 @@ export const uploadReceiptImageRequest = (file) => {
 
   formData.append("image", file);
 
-  return apiRequest("/api/v1/uploads/receipt", {
+  return apiRequest("/uploads/receipt", {
     method: "POST",
     body: formData,
   });
