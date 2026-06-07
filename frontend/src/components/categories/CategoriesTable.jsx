@@ -87,7 +87,7 @@ const CategoriesTable = ({ categories, deleting, onEdit, onDelete }) => {
                     color="error"
                     size="small"
                     disabled={deleting}
-                    onClick={() => onDelete(category._id)}
+                    onClick={() => onDelete(category)}
                   >
                     Eliminar
                   </Button>

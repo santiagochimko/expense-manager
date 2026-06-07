@@ -7,7 +7,8 @@ import {
 import {
   loadCurrentUser,
   loginUser,
-  registerUser
+  registerUser,
+  updateMyPlan,
 } from "./authThunks.js";
 
 const storedToken = getStoredToken();
@@ -108,8 +109,25 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
-      });
-  }
+      })
+      .addCase(updateMyPlan.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.validationErrors = [];
+      })
+    .addCase(updateMyPlan.fulfilled, (state, action) => {
+      state.loading = false;
+
+      if (state.user) {
+        state.user.plan = action.payload.plan;
+      }
+    })
+    .addCase(updateMyPlan.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload?.message || "No se pudo actualizar el plan";
+      state.validationErrors = action.payload?.errors || [];
+    });
+}
 });
 
 export const { logout, clearAuthError } = authSlice.actions;

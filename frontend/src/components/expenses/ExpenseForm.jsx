@@ -1,5 +1,6 @@
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Alert,
   Box,
@@ -11,7 +12,15 @@ import {
   Select,
   Stack,
   TextField,
+  Typography,
 } from "@mui/material";
+
+import { uploadReceiptImage } from "../../features/uploads/uploadsThunks.js";
+import {
+  selectUploadError,
+  selectUploadLoading,
+} from "../../features/uploads/uploadsSelectors.js";
+import { clearUploadError } from "../../features/uploads/uploadsSlice.js";
 
 const confidenceLabels = {
   low: "baja",
@@ -32,8 +41,7 @@ const expenseSchema = Yup.object({
     .min(2, "Mínimo 2 caracteres")
     .max(100, "Máximo 100 caracteres")
     .required("El título es obligatorio"),
-  description: Yup.string()
-    .trim(),
+  description: Yup.string().trim(),
   amount: Yup.number()
     .typeError("El monto debe ser numérico")
     .positive("El monto debe ser mayor a 0")
@@ -43,8 +51,7 @@ const expenseSchema = Yup.object({
     .required("La fecha es obligatoria"),
   paymentMethod: Yup.string()
     .oneOf(paymentMethodValues, "Método de pago inválido"),
-  category: Yup.string()
-    .required("La categoría es obligatoria"),
+  category: Yup.string().required("La categoría es obligatoria"),
   receiptImageUrl: Yup.string()
     .trim()
     .test("is-url-or-empty", "Debe ser una URL válida", (value) => {
@@ -109,6 +116,11 @@ const ExpenseForm = ({
   onCancel,
   onSuggestCategory,
 }) => {
+  const dispatch = useDispatch();
+
+  const uploadLoading = useSelector(selectUploadLoading);
+  const uploadError = useSelector(selectUploadError);
+
   const formik = useFormik({
     initialValues: getInitialValues(selectedExpense),
     validationSchema: expenseSchema,
@@ -153,6 +165,29 @@ const ExpenseForm = ({
     }
   };
 
+  const handleUploadReceipt = async (event) => {
+    const file = event.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    dispatch(clearUploadError());
+
+    const result = await dispatch(uploadReceiptImage(file));
+
+    if (uploadReceiptImage.fulfilled.match(result)) {
+      formik.setFieldValue("receiptImageUrl", result.payload.url);
+    }
+
+    event.target.value = "";
+  };
+
+  const handleRemoveReceipt = () => {
+    formik.setFieldValue("receiptImageUrl", "");
+    dispatch(clearUploadError());
+  };
+
   const getFieldError = (fieldName) => {
     return (
       (formik.touched[fieldName] && formik.errors[fieldName]) ||
@@ -167,6 +202,8 @@ const ExpenseForm = ({
   const paymentMethodError = getFieldError("paymentMethod");
   const categoryError = getFieldError("category");
   const receiptImageUrlError = getFieldError("receiptImageUrl");
+
+  const receiptError = uploadError || receiptImageUrlError;
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
@@ -306,19 +343,62 @@ const ExpenseForm = ({
           )}
         </FormControl>
 
-        <TextField
-          label="URL del comprobante"
-          name="receiptImageUrl"
-          value={formik.values.receiptImageUrl}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          fullWidth
-          error={Boolean(receiptImageUrlError)}
-          helperText={
-            receiptImageUrlError ||
-            "Opcional. Debe ser una URL válida si se completa"
-          }
-        />
+        <Stack spacing={1}>
+          <Typography variant="body2" fontWeight={600}>
+            Comprobante del gasto
+          </Typography>
+
+          {receiptError && <Alert severity="error">{receiptError}</Alert>}
+
+          {formik.values.receiptImageUrl && (
+            <Box
+              component="img"
+              src={formik.values.receiptImageUrl}
+              alt="Comprobante del gasto"
+              sx={{
+                width: "100%",
+                maxHeight: 220,
+                objectFit: "cover",
+                borderRadius: 1,
+                border: "1px solid",
+                borderColor: "divider",
+              }}
+            />
+          )}
+
+          <Box sx={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            <Button variant="outlined" component="label" disabled={uploadLoading}>
+              {uploadLoading
+                ? "Subiendo..."
+                : formik.values.receiptImageUrl
+                  ? "Cambiar comprobante"
+                  : "Subir comprobante"}
+
+              <input
+                type="file"
+                hidden
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleUploadReceipt}
+              />
+            </Button>
+
+            {formik.values.receiptImageUrl && (
+              <Button
+                type="button"
+                variant="text"
+                color="error"
+                disabled={uploadLoading}
+                onClick={handleRemoveReceipt}
+              >
+                Quitar
+              </Button>
+            )}
+          </Box>
+
+          <Typography variant="caption" color="text.secondary">
+            Formatos permitidos: JPG, PNG o WEBP. Máximo 2MB.
+          </Typography>
+        </Stack>
 
         <Box
           sx={{
@@ -329,7 +409,7 @@ const ExpenseForm = ({
           <Button
             type="submit"
             variant="contained"
-            disabled={!formik.isValid || saving}
+            disabled={!formik.isValid || saving || uploadLoading}
           >
             {saving
               ? "Guardando..."

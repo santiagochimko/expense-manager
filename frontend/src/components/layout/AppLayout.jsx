@@ -60,15 +60,7 @@ const AppLayout = () => {
                 <>
                   <Button component={RouterLink} to="/admin/dashboard">
                     Dashboard admin
-                  </Button>
-
-                  <Button component={RouterLink} to="/admin/users">
-                    Usuarios
-                  </Button>
-
-                  <Button component={RouterLink} to="/admin/expenses">
-                    Gastos globales
-                  </Button>
+                  </Button>                  
                 </>
               ) : (
                 <>

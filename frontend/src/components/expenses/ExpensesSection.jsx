@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 
+import ConfirmDialog from "../common/ConfirmDialog.jsx";
 import ExpenseForm from "./ExpenseForm.jsx";
 import ExpensesFilters from "./ExpensesFilters.jsx";
 import ExpensesPagination from "./ExpensesPagination.jsx";
@@ -79,6 +80,7 @@ const ExpensesSection = () => {
   const aiSuggestion = useSelector(selectAiSuggestion);
 
   const [selectedExpense, setSelectedExpense] = useState(null);
+  const [expenseToDelete, setExpenseToDelete] = useState(null);
   const [localFilters, setLocalFilters] = useState({
     search: "",
     category: "",
@@ -115,7 +117,7 @@ const ExpensesSection = () => {
           updateExpense({
             expenseId: selectedExpense._id,
             expenseData,
-          })
+          }),
         )
       : await dispatch(createExpense(expenseData));
 
@@ -143,24 +145,32 @@ const ExpensesSection = () => {
     setSelectedExpense(null);
   };
 
-  const handleDelete = async (expenseId) => {
-    const confirmDelete = window.confirm(
-      "¿Seguro que querés eliminar este gasto?"
-    );
+  const handleRequestDelete = (expense) => {
+    setExpenseToDelete(expense);
+  };
 
-    if (!confirmDelete) {
+  const handleCloseDeleteDialog = () => {
+    if (!deleting) {
+      setExpenseToDelete(null);
+    }
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!expenseToDelete) {
       return;
     }
 
-    const result = await dispatch(deleteExpense(expenseId));
+    const result = await dispatch(deleteExpense(expenseToDelete._id));
 
     if (deleteExpense.fulfilled.match(result)) {
       dispatch(fetchExpenses(filters));
       refreshDashboard();
-    }
 
-    if (selectedExpense?._id === expenseId) {
-      setSelectedExpense(null);
+      if (selectedExpense?._id === expenseToDelete._id) {
+        setSelectedExpense(null);
+      }
+
+      setExpenseToDelete(null);
     }
   };
 
@@ -198,104 +208,121 @@ const ExpensesSection = () => {
   }
 
   return (
-    <Stack spacing={2}>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-        }}
-      >
-        <div>
-          <Typography variant="h5" component="h2">
-            Gastos
-          </Typography>
-
-          <Typography color="text.secondary">
-            Registrá, filtrá y administrá tus gastos.
-          </Typography>
-        </div>
-
-        <Button
-          variant="outlined"
-          onClick={handleReload}
-          disabled={loading || categoriesLoading}
+    <>
+      <Stack spacing={2}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
         >
-          Actualizar
-        </Button>
-      </Box>
-
-      {error && <Alert severity="error">{error}</Alert>}
-
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            md: "minmax(280px, 420px) 1fr",
-          },
-          gap: 3,
-        }}
-      >
-        <Paper sx={{ p: 3 }}>
-          <Typography variant="h6" component="h3" gutterBottom>
-            {selectedExpense ? "Editar gasto" : "Nuevo gasto"}
-          </Typography>
-
-          {categories.length === 0 ? (
-            <Alert severity="info">
-              Para crear gastos primero necesitás crear al menos una categoría.
-            </Alert>
-          ) : (
-            <ExpenseForm
-              key={selectedExpense?._id || "new-expense"}
-              selectedExpense={selectedExpense}
-              categories={categories}
-              validationErrors={validationErrors}
-              saving={saving}
-              aiLoading={aiLoading}
-              aiError={aiError}
-              aiSuggestion={aiSuggestion}
-              onSubmit={handleSubmit}
-              onCancel={handleCancelEdit}
-              onSuggestCategory={handleSuggestCategory}
-            />
-          )}
-        </Paper>
-
-        <Stack spacing={2}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" component="h3" gutterBottom>
-              Filtros
+          <div>
+            <Typography variant="h5" component="h2">
+              Gastos
             </Typography>
 
-            <ExpensesFilters
-              filters={localFilters}
-              categories={categories}
-              onChange={setLocalFilters}
-              onApply={handleApplyFilters}
-              onClear={handleClearFilters}
-            />
+            <Typography color="text.secondary">
+              Registrá, filtrá y administrá tus gastos.
+            </Typography>
+          </div>
+
+          <Button
+            variant="outlined"
+            onClick={handleReload}
+            disabled={loading || categoriesLoading}
+          >
+            Actualizar
+          </Button>
+        </Box>
+
+        {error && <Alert severity="error">{error}</Alert>}
+
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "minmax(280px, 420px) 1fr",
+            },
+            gap: 3,
+          }}
+        >
+          <Paper sx={{ p: 3 }}>
+            <Typography variant="h6" component="h3" gutterBottom>
+              {selectedExpense ? "Editar gasto" : "Nuevo gasto"}
+            </Typography>
+
+            {categories.length === 0 ? (
+              <Alert severity="info">
+                Para crear gastos primero necesitás crear al menos una
+                categoría.
+              </Alert>
+            ) : (
+              <ExpenseForm
+                key={selectedExpense?._id || "new-expense"}
+                selectedExpense={selectedExpense}
+                categories={categories}
+                validationErrors={validationErrors}
+                saving={saving}
+                aiLoading={aiLoading}
+                aiError={aiError}
+                aiSuggestion={aiSuggestion}
+                onSubmit={handleSubmit}
+                onCancel={handleCancelEdit}
+                onSuggestCategory={handleSuggestCategory}
+              />
+            )}
           </Paper>
 
-          <ExpensesTable
-            expenses={expenses || []}
-            deleting={deleting}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-          />
+          <Stack spacing={2}>
+            <Paper sx={{ p: 3 }}>
+              <Typography variant="h6" component="h3" gutterBottom>
+                Filtros
+              </Typography>
 
-          <ExpensesPagination
-            page={page}
-            total={total}
-            totalPages={totalPages}
-            loading={loading}
-            onPageChange={handlePageChange}
-          />
-        </Stack>
-      </Box>
-    </Stack>
+              <ExpensesFilters
+                filters={localFilters}
+                categories={categories}
+                onChange={setLocalFilters}
+                onApply={handleApplyFilters}
+                onClear={handleClearFilters}
+              />
+            </Paper>
+
+            <ExpensesTable
+              expenses={expenses || []}
+              deleting={deleting}
+              onEdit={handleEdit}
+              onDelete={handleRequestDelete}
+            />
+
+            <ExpensesPagination
+              page={page}
+              total={total}
+              totalPages={totalPages}
+              loading={loading}
+              onPageChange={handlePageChange}
+            />
+          </Stack>
+        </Box>
+      </Stack>
+
+      <ConfirmDialog
+        open={Boolean(expenseToDelete)}
+        title="Eliminar gasto"
+        description={
+          expenseToDelete
+            ? `¿Seguro que querés eliminar el gasto "${expenseToDelete.title}"? Esta acción no se puede deshacer.`
+            : ""
+        }
+        confirmText="Eliminar"
+        loading={deleting}
+        onConfirm={handleConfirmDelete}
+        onClose={handleCloseDeleteDialog}
+      />
+    </>
   );
 };
 
