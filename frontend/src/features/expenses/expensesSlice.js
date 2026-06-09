@@ -36,21 +36,26 @@ const expensesSlice = createSlice({
         page: 1,
       };
     },
+
     setExpensePage: (state, action) => {
       state.filters.page = action.payload;
     },
+
     clearExpensesError: (state) => {
       state.error = null;
       state.validationErrors = [];
     },
+
     clearExpenses: () => initialState,
   },
+
   extraReducers: (builder) => {
     builder
       .addCase(fetchExpenses.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
+
       .addCase(fetchExpenses.fulfilled, (state, action) => {
         state.loading = false;
 
@@ -62,6 +67,7 @@ const expensesSlice = createSlice({
         state.total = payload.total || 0;
         state.totalPages = payload.totalPages || 1;
       })
+
       .addCase(fetchExpenses.rejected, (state, action) => {
         state.loading = false;
         state.error =
@@ -73,9 +79,24 @@ const expensesSlice = createSlice({
         state.error = null;
         state.validationErrors = [];
       })
-      .addCase(createExpense.fulfilled, (state) => {
+
+      .addCase(createExpense.fulfilled, (state, action) => {
         state.saving = false;
+
+        const newExpense = action.payload;
+
+        if (newExpense && state.page === 1) {
+          state.items.unshift(newExpense);
+
+          if (state.items.length > state.limit) {
+            state.items.pop();
+          }
+        }
+
+        state.total += 1;
+        state.totalPages = Math.max(1, Math.ceil(state.total / state.limit));
       })
+
       .addCase(createExpense.rejected, (state, action) => {
         state.saving = false;
         state.error = action.payload?.message || "No se pudo crear el gasto";
@@ -87,9 +108,21 @@ const expensesSlice = createSlice({
         state.error = null;
         state.validationErrors = [];
       })
-      .addCase(updateExpense.fulfilled, (state) => {
+
+      .addCase(updateExpense.fulfilled, (state, action) => {
         state.saving = false;
+
+        const updatedExpense = action.payload;
+
+        const index = state.items.findIndex((item) => {
+          return item?._id === updatedExpense?._id;
+        });
+
+        if (index !== -1) {
+          state.items[index] = updatedExpense;
+        }
       })
+
       .addCase(updateExpense.rejected, (state, action) => {
         state.saving = false;
         state.error =
@@ -101,12 +134,26 @@ const expensesSlice = createSlice({
         state.deleting = true;
         state.error = null;
       })
+
       .addCase(deleteExpense.fulfilled, (state, action) => {
         state.deleting = false;
+
         state.items = state.items.filter((item) => {
-          return item._id !== action.payload;
+          return item?._id !== action.payload;
         });
+
+        if (state.total > 0) {
+          state.total -= 1;
+        }
+
+        state.totalPages = Math.max(1, Math.ceil(state.total / state.limit));
+
+        if (state.page > state.totalPages) {
+          state.page = state.totalPages;
+          state.filters.page = state.totalPages;
+        }
       })
+
       .addCase(deleteExpense.rejected, (state, action) => {
         state.deleting = false;
         state.error =

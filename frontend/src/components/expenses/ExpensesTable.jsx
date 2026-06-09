@@ -30,9 +30,13 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
   const [previewImage, setPreviewImage] = useState(null);
 
   const handleOpenPreview = (expense) => {
+    if (!expense?.receiptImageUrl) {
+      return;
+    }
+
     setPreviewImage({
       url: expense.receiptImageUrl,
-      title: expense.title,
+      title: expense?.title || "Comprobante",
     });
   };
 
@@ -67,13 +71,18 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
           </TableHead>
 
           <TableBody>
-            {expenses.map((expense) => (
-              <TableRow key={expense._id}>
-                <TableCell>{formatDate(expense.date)}</TableCell>
+            {expenses.filter(Boolean).map((expense) => (
+              <TableRow key={expense?._id}>
+                <TableCell>
+                  {expense?.date ? formatDate(expense.date) : "Sin fecha"}
+                </TableCell>
 
                 <TableCell>
-                  <Typography fontWeight={600}>{expense.title}</Typography>
-                  {expense.description && (
+                  <Typography fontWeight={600}>
+                    {expense?.title || "Sin título"}
+                  </Typography>
+
+                  {expense?.description && (
                     <Typography variant="body2" color="text.secondary">
                       {expense.description}
                     </Typography>
@@ -81,27 +90,21 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                 </TableCell>
 
                 <TableCell>
-                  {expense.category ? (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 1,
-                      }}
-                    >
+                  {expense?.category ? (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                       <Box
                         sx={{
                           width: 12,
                           height: 12,
                           borderRadius: "50%",
-                          bgcolor: expense.category.color,
+                          bgcolor: expense.category?.color || "grey.400",
                           border: "1px solid",
                           borderColor: "divider",
                         }}
                       />
 
                       <Typography variant="body2">
-                        {expense.category.name}
+                        {expense.category?.name || "Sin categoría"}
                       </Typography>
                     </Box>
                   ) : (
@@ -113,8 +116,8 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                   <Chip
                     size="small"
                     label={
-                      paymentMethodLabels[expense.paymentMethod] ||
-                      expense.paymentMethod ||
+                      paymentMethodLabels[expense?.paymentMethod] ||
+                      expense?.paymentMethod ||
                       "Sin método"
                     }
                     variant="outlined"
@@ -122,33 +125,16 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                 </TableCell>
 
                 <TableCell>
-                  {expense.receiptImageUrl ? (
+                  {expense?.receiptImageUrl ? (
                     <Box
                       component="button"
                       type="button"
                       onClick={() => handleOpenPreview(expense)}
-                      sx={{
-                        width: 56,
-                        height: 40,
-                        p: 0,
-                        border: "1px solid",
-                        borderColor: "divider",
-                        borderRadius: 1,
-                        overflow: "hidden",
-                        cursor: "pointer",
-                        background: "transparent",
-                      }}
                     >
                       <Box
                         component="img"
                         src={expense.receiptImageUrl}
-                        alt={`Comprobante de ${expense.title}`}
-                        sx={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                          display: "block",
-                        }}
+                        alt={`Comprobante de ${expense?.title || "gasto"}`}
                       />
                     </Box>
                   ) : (
@@ -158,34 +144,18 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                   )}
                 </TableCell>
 
-                <TableCell align="right">${expense.amount}</TableCell>
+                <TableCell align="right">${expense?.amount ?? 0}</TableCell>
 
                 <TableCell align="right">
-                  <Box
-                    sx={{
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      gap: 1,
-                    }}
-                  >
-                    <Button
-                      variant="outlined"
-                      size="small"
-                      onClick={() => onEdit(expense)}
-                    >
-                      Editar
-                    </Button>
+                  <Button onClick={() => onEdit(expense)}>Editar</Button>
 
-                    <Button
-                      variant="outlined"
-                      color="error"
-                      size="small"
-                      disabled={deleting}
-                      onClick={() => onDelete(expense)}
-                    >
-                      Eliminar
-                    </Button>
-                  </Box>
+                  <Button
+                    color="error"
+                    disabled={deleting}
+                    onClick={() => onDelete(expense)}
+                  >
+                    Eliminar
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

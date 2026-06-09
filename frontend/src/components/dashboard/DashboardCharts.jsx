@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Alert,
   Box,
-  Button,
   CircularProgress,
   Paper,
   Stack,
@@ -78,10 +77,6 @@ const DashboardCharts = () => {
     dispatch(fetchDashboardCharts());
   }, [dispatch]);
 
-  const handleReload = () => {
-    dispatch(fetchDashboardCharts());
-  };
-
   const categoryChartData = getCategoryChartData(charts);
   const monthlyChartData = getMonthlyChartData(charts);
   const paymentMethodChartData = getPaymentMethodChartData(charts);
@@ -98,27 +93,14 @@ const DashboardCharts = () => {
 
   return (
     <Stack spacing={2}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 2,
-        }}
-      >
-        <div>
-          <Typography variant="h5" component="h2">
-            Gráficos
-          </Typography>
+      <Box>
+        <Typography variant="h5" component="h2">
+          Gráficos
+        </Typography>
 
-          <Typography color="text.secondary">
-            Visualización de gastos por categoría, mes y método de pago.
-          </Typography>
-        </div>
-
-        <Button variant="outlined" onClick={handleReload} disabled={loading}>
-          Actualizar
-        </Button>
+        <Typography color="text.secondary">
+          Visualización de gastos por categoría, mes y método de pago.
+        </Typography>
       </Box>
 
       {error && <Alert severity="error">{error}</Alert>}

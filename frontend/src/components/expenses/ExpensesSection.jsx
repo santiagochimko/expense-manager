@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Alert,
   Box,
-  Button,
   CircularProgress,
   Paper,
   Stack,
@@ -17,10 +16,7 @@ import ExpensesPagination from "./ExpensesPagination.jsx";
 import ExpensesTable from "./ExpensesTable.jsx";
 
 import { fetchCategories } from "../../features/categories/categoriesThunks.js";
-import {
-  selectCategories,
-  selectCategoriesLoading,
-} from "../../features/categories/categoriesSelectors.js";
+import { selectCategories } from "../../features/categories/categoriesSelectors.js";
 
 import {
   clearExpensesError,
@@ -53,6 +49,7 @@ import {
   selectAiSuggestion,
 } from "../../features/ai/aiSelectors.js";
 import { clearAiSuggestion } from "../../features/ai/aiSlice.js";
+
 import {
   fetchDashboardCharts,
   fetchDashboardSummary,
@@ -62,7 +59,6 @@ const ExpensesSection = () => {
   const dispatch = useDispatch();
 
   const categories = useSelector(selectCategories) || [];
-  const categoriesLoading = useSelector(selectCategoriesLoading);
 
   const expenses = useSelector(selectExpenses) || [];
   const filters = useSelector(selectExpensesFilters);
@@ -81,6 +77,7 @@ const ExpensesSection = () => {
 
   const [selectedExpense, setSelectedExpense] = useState(null);
   const [expenseToDelete, setExpenseToDelete] = useState(null);
+  const [formResetKey, setFormResetKey] = useState(0);
   const [localFilters, setLocalFilters] = useState({
     search: "",
     category: "",
@@ -97,6 +94,11 @@ const ExpensesSection = () => {
   const refreshDashboard = () => {
     dispatch(fetchDashboardSummary());
     dispatch(fetchDashboardCharts());
+  };
+
+  const syncExpensesAndDashboard = () => {
+    dispatch(fetchExpenses(filters));
+    refreshDashboard();
   };
 
   const handleSuggestCategory = async (expenseData) => {
@@ -117,7 +119,7 @@ const ExpensesSection = () => {
           updateExpense({
             expenseId: selectedExpense._id,
             expenseData,
-          }),
+          })
         )
       : await dispatch(createExpense(expenseData));
 
@@ -125,11 +127,17 @@ const ExpensesSection = () => {
       createExpense.fulfilled.match(result) ||
       updateExpense.fulfilled.match(result)
     ) {
+      const wasCreating = createExpense.fulfilled.match(result);
+
       setSelectedExpense(null);
       dispatch(clearExpensesError());
       dispatch(clearAiSuggestion());
-      dispatch(fetchExpenses(filters));
-      refreshDashboard();
+
+      if (wasCreating) {
+        setFormResetKey((current) => current + 1);
+      }
+
+      syncExpensesAndDashboard();
     }
   };
 
@@ -163,14 +171,13 @@ const ExpensesSection = () => {
     const result = await dispatch(deleteExpense(expenseToDelete._id));
 
     if (deleteExpense.fulfilled.match(result)) {
-      dispatch(fetchExpenses(filters));
-      refreshDashboard();
-
       if (selectedExpense?._id === expenseToDelete._id) {
         setSelectedExpense(null);
       }
 
       setExpenseToDelete(null);
+
+      syncExpensesAndDashboard();
     }
   };
 
@@ -192,11 +199,6 @@ const ExpensesSection = () => {
     dispatch(setExpensePage(newPage));
   };
 
-  const handleReload = () => {
-    dispatch(fetchCategories());
-    dispatch(fetchExpenses(filters));
-  };
-
   if (loading && expenses.length === 0) {
     return (
       <Paper sx={{ p: 3 }}>
@@ -210,31 +212,14 @@ const ExpensesSection = () => {
   return (
     <>
       <Stack spacing={2}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-          }}
-        >
-          <div>
-            <Typography variant="h5" component="h2">
-              Gastos
-            </Typography>
+        <Box>
+          <Typography variant="h5" component="h2">
+            Gastos
+          </Typography>
 
-            <Typography color="text.secondary">
-              Registrá, filtrá y administrá tus gastos.
-            </Typography>
-          </div>
-
-          <Button
-            variant="outlined"
-            onClick={handleReload}
-            disabled={loading || categoriesLoading}
-          >
-            Actualizar
-          </Button>
+          <Typography color="text.secondary">
+            Registrá, filtrá y administrá tus gastos.
+          </Typography>
         </Box>
 
         {error && <Alert severity="error">{error}</Alert>}
@@ -261,7 +246,7 @@ const ExpensesSection = () => {
               </Alert>
             ) : (
               <ExpenseForm
-                key={selectedExpense?._id || "new-expense"}
+                key={`${selectedExpense?._id || "new-expense"}-${formResetKey}`}
                 selectedExpense={selectedExpense}
                 categories={categories}
                 validationErrors={validationErrors}

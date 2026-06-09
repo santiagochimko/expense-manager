@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Alert,
   Box,
-  Button,
   CircularProgress,
   Paper,
   Stack,
@@ -29,10 +28,6 @@ const DashboardSummary = () => {
     dispatch(fetchDashboardSummary());
   }, [dispatch]);
 
-  const handleReload = () => {
-    dispatch(fetchDashboardSummary());
-  };
-
   if (loading && !summary) {
     return (
       <Paper sx={{ p: 3 }}>
@@ -45,27 +40,14 @@ const DashboardSummary = () => {
 
   return (
     <Stack spacing={2}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          gap: 2,
-        }}
-      >
-        <div>
-          <Typography variant="h5" component="h2">
-            Resumen
-          </Typography>
+      <Box>
+        <Typography variant="h5" component="h2">
+          Resumen
+        </Typography>
 
-          <Typography color="text.secondary">
-            Estado general de tus gastos.
-          </Typography>
-        </div>
-
-        <Button variant="outlined" onClick={handleReload} disabled={loading}>
-          Actualizar
-        </Button>
+        <Typography color="text.secondary">
+          Estado general de tus gastos.
+        </Typography>
       </Box>
 
       {error && <Alert severity="error">{error}</Alert>}
