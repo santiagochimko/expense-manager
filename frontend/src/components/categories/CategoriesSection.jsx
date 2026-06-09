@@ -42,6 +42,7 @@ const CategoriesSection = () => {
 
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [categoryToDelete, setCategoryToDelete] = useState(null);
+  const [formResetKey, setFormResetKey] = useState(0);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -63,8 +64,10 @@ const CategoriesSection = () => {
     ) {
       setSelectedCategory(null);
       dispatch(clearCategoriesError());
-      dispatch(fetchCategories());
-      dispatch(fetchDashboardCharts());
+
+      if (createCategory.fulfilled.match(result)) {
+        setFormResetKey((current) => current + 1);
+      }
     }
   };
 
@@ -164,7 +167,7 @@ const CategoriesSection = () => {
             </Typography>
 
             <CategoryForm
-              key={selectedCategory?._id || "new-category"}
+              key={`${selectedCategory?._id || "new-category"}-${formResetKey}`}
               selectedCategory={selectedCategory}
               validationErrors={validationErrors}
               saving={saving}
