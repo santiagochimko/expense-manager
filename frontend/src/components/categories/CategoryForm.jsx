@@ -24,14 +24,14 @@ const getInitialValues = (selectedCategory) => {
     return {
       name: selectedCategory.name || "",
       description: selectedCategory.description || "",
-      color: selectedCategory.color || "#c8a96a",
+      color: selectedCategory.color || "#2563eb",
     };
   }
 
   return {
     name: "",
     description: "",
-    color: "#c8a96a",
+    color: "#2563eb",
   };
 };
 
@@ -130,7 +130,7 @@ const CategoryForm = ({
             type="submit"
             variant="contained"
             disabled={saving}
-            fullWidth={!selectedCategory}
+            sx={{ width: { xs: "100%", sm: "auto" } }}
           >
             {saving
               ? "Guardando..."
