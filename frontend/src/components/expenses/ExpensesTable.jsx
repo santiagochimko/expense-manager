@@ -128,10 +128,13 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                 <Chip
                   label={expense?.category?.name || "Sin categoría"}
                   size="small"
-                  sx={{
-                    bgcolor: "rgba(200, 169, 106, 0.12)",
+                  sx={(theme) => ({
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(56, 189, 248, 0.14)"
+                        : "rgba(37, 99, 235, 0.1)",
                     color: "text.primary",
-                  }}
+                  })}
                 />
               </Stack>
 
@@ -191,11 +194,14 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
             {expenses.filter(Boolean).map((expense) => (
               <TableRow
                 key={expense?._id}
-                sx={{
+                sx={(theme) => ({
                   "&:hover": {
-                    bgcolor: "rgba(200, 169, 106, 0.05)",
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(56, 189, 248, 0.05)"
+                        : "rgba(37, 99, 235, 0.04)",
                   },
-                }}
+                })}
               >
                 <TableCell>
                   {expense?.date ? formatDate(expense.date) : "Sin fecha"}
