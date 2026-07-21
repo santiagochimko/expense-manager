@@ -8,6 +8,14 @@ import DashboardSummary from "../components/dashboard/DashboardSummary.jsx";
 import DashboardCharts from "../components/dashboard/DashboardCharts.jsx";
 import PlanUpgradeCard from "../components/users/PlanUpgradeCard.jsx";
 
+const ctaButtonSx = {
+  minHeight: 42,
+  height: 42,
+  px: 2.25,
+  alignSelf: { xs: "stretch", sm: "center" },
+  width: { xs: "100%", sm: "auto" },
+};
+
 const DashboardPage = () => {
   return (
     <Stack spacing={{ xs: 3, md: 4 }}>
@@ -36,7 +44,7 @@ const DashboardPage = () => {
         <Stack
           direction={{ xs: "column", md: "row" }}
           justifyContent="space-between"
-          alignItems={{ xs: "flex-start", md: "flex-end" }}
+          alignItems={{ xs: "flex-start", md: "center" }}
           spacing={3}
           sx={{ position: "relative" }}
         >
@@ -63,13 +71,20 @@ const DashboardPage = () => {
             </Typography>
           </Stack>
 
-          <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} width={{ xs: "100%", sm: "auto" }}>
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={1.5}
+            alignItems={{ xs: "stretch", sm: "center" }}
+            justifyContent="center"
+            width={{ xs: "100%", sm: "auto" }}
+          >
             <Button
               component={RouterLink}
               to="/expenses"
               variant="contained"
               startIcon={<AddRoundedIcon />}
               sx={{
+                ...ctaButtonSx,
                 bgcolor: "#38bdf8",
                 color: "#020617",
                 background: "linear-gradient(135deg, #38bdf8, #2563eb)",
@@ -87,6 +102,7 @@ const DashboardPage = () => {
               variant="outlined"
               startIcon={<CategoryOutlinedIcon />}
               sx={{
+                ...ctaButtonSx,
                 color: "#f8fbff",
                 borderColor: "rgba(248, 251, 255, 0.24)",
                 backgroundColor: "rgba(248, 251, 255, 0.08)",
@@ -124,7 +140,13 @@ const DashboardPage = () => {
           </Typography>
         </Box>
 
-        <Button component={RouterLink} to="/expenses" variant="outlined" startIcon={<ReceiptLongOutlinedIcon />}>
+        <Button
+          component={RouterLink}
+          to="/expenses"
+          variant="outlined"
+          startIcon={<ReceiptLongOutlinedIcon />}
+          sx={{ minHeight: 42, height: 42 }}
+        >
           Ver gastos
         </Button>
       </Box>
