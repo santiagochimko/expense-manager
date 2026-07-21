@@ -15,7 +15,6 @@ import {
   ListItemIcon,
   ListItemText,
   Stack,
-  Switch,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -99,51 +98,66 @@ const AppLayout = () => {
     return location.pathname === to || location.pathname.startsWith(`${to}/`);
   };
 
-  const modeSwitch = (
-    <Stack
-      direction="row"
-      spacing={0.75}
-      alignItems="center"
+  const modeToggle = (
+    <Box
+      component="button"
+      type="button"
+      onClick={toggleMode}
+      aria-label="Cambiar modo oscuro"
+      aria-pressed={isDark}
       sx={{
         height: 40,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 0.75,
+        p: 0,
+        border: 0,
+        bgcolor: "transparent",
+        color: "text.primary",
+        cursor: "pointer",
+        font: "inherit",
+        lineHeight: 1,
         flexShrink: 0,
-        "& .MuiSwitch-root": {
-          width: 38,
-          height: 24,
-          p: 0,
-          display: "flex",
-          alignItems: "center",
-        },
-        "& .MuiSwitch-switchBase": {
-          p: "3px",
-        },
-        "& .MuiSwitch-thumb": {
-          width: 18,
-          height: 18,
-        },
-        "& .MuiSwitch-track": {
-          borderRadius: 999,
-        },
       }}
     >
-      <Switch
-        checked={isDark}
-        onChange={toggleMode}
-        inputProps={{ "aria-label": "Cambiar modo oscuro" }}
-      />
-
-      <Box sx={{ display: "grid", placeItems: "center", width: 20, height: 20 }}>
-        {isDark ? (
-          <DarkModeOutlinedIcon fontSize="small" />
-        ) : (
-          <LightModeOutlinedIcon fontSize="small" />
-        )}
+      <Box
+        component="span"
+        sx={(theme) => ({
+          width: 38,
+          height: 22,
+          display: "flex",
+          alignItems: "center",
+          p: "2px",
+          borderRadius: 999,
+          bgcolor: isDark ? theme.palette.primary.main : "rgba(15, 23, 42, 0.34)",
+          transition: "background-color 160ms ease",
+        })}
+      >
+        <Box
+          component="span"
+          sx={(theme) => ({
+            width: 18,
+            height: 18,
+            borderRadius: "50%",
+            bgcolor: isDark ? theme.palette.primary.contrastText : "#ffffff",
+            transform: isDark ? "translateX(16px)" : "translateX(0)",
+            transition: "transform 160ms ease",
+            boxShadow: "0 1px 4px rgba(15, 23, 42, 0.26)",
+          })}
+        />
       </Box>
 
-      <Typography variant="body2" fontWeight={700} lineHeight={1}>
+      {isDark ? (
+        <DarkModeOutlinedIcon fontSize="small" sx={{ display: "block" }} />
+      ) : (
+        <LightModeOutlinedIcon fontSize="small" sx={{ display: "block" }} />
+      )}
+
+      <Typography variant="body2" fontWeight={700} sx={{ lineHeight: 1 }}>
         {isDark ? "Oscuro" : "Claro"}
       </Typography>
-    </Stack>
+    </Box>
   );
 
   const drawerContent = (
@@ -206,7 +220,7 @@ const AppLayout = () => {
 
       <Divider sx={{ my: 2 }} />
 
-      <Box sx={{ mb: 1.5 }}>{modeSwitch}</Box>
+      <Box sx={{ mb: 1.5 }}>{modeToggle}</Box>
 
       {user && (
         <Chip
@@ -352,7 +366,7 @@ const AppLayout = () => {
                   height: 40,
                 }}
               >
-                {modeSwitch}
+                {modeToggle}
               </Box>
 
               {user && (
