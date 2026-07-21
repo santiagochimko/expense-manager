@@ -10,15 +10,18 @@ const SummaryCard = ({ title, value, helperText }) => {
       }}
     >
       <Box
-        sx={{
+        sx={(theme) => ({
           position: "absolute",
           top: 0,
           right: 0,
           width: 96,
           height: 96,
           borderRadius: "0 0 0 100%",
-          bgcolor: "rgba(200, 169, 106, 0.12)",
-        }}
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? "rgba(56, 189, 248, 0.12)"
+              : "rgba(37, 99, 235, 0.1)",
+        })}
       />
 
       <CardContent sx={{ p: { xs: 2.5, sm: 3 }, position: "relative" }}>
