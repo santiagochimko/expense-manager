@@ -35,16 +35,19 @@ const CategoriesTable = ({ categories, deleting, onEdit, onDelete }) => {
             <Stack spacing={2}>
               <Stack direction="row" spacing={1.5} alignItems="center">
                 <Box
-                  sx={{
+                  sx={(theme) => ({
                     width: 34,
                     height: 34,
                     borderRadius: "50%",
                     bgcolor: category.color,
                     border: "1px solid",
                     borderColor: "divider",
-                    boxShadow: "0 0 0 6px rgba(20, 17, 15, 0.04)",
+                    boxShadow:
+                      theme.palette.mode === "dark"
+                        ? "0 0 0 6px rgba(56, 189, 248, 0.08)"
+                        : "0 0 0 6px rgba(37, 99, 235, 0.06)",
                     flex: "0 0 auto",
-                  }}
+                  })}
                 />
 
                 <Box sx={{ minWidth: 0, flex: 1 }}>
@@ -104,11 +107,14 @@ const CategoriesTable = ({ categories, deleting, onEdit, onDelete }) => {
             {categories.map((category) => (
               <TableRow
                 key={category._id}
-                sx={{
+                sx={(theme) => ({
                   "&:hover": {
-                    bgcolor: "rgba(200, 169, 106, 0.05)",
+                    bgcolor:
+                      theme.palette.mode === "dark"
+                        ? "rgba(56, 189, 248, 0.05)"
+                        : "rgba(37, 99, 235, 0.04)",
                   },
-                }}
+                })}
               >
                 <TableCell>
                   <Box
