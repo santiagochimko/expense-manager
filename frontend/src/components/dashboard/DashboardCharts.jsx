@@ -29,6 +29,11 @@ import {
 } from "../../features/dashboard/dashboardSelectors.js";
 import { fetchDashboardCharts } from "../../features/dashboard/dashboardThunks.js";
 
+const chartColor = "#c8a96a";
+const lineColor = "#14110f";
+const gridColor = "rgba(20, 17, 15, 0.08)";
+const axisColor = "#7b7166";
+
 const getCategoryChartData = (charts) => {
   const expensesByCategory = charts?.expensesByCategory || [];
 
@@ -66,6 +71,20 @@ const getPaymentMethodChartData = (charts) => {
   }));
 };
 
+const chartSx = {
+  width: "100%",
+  height: { xs: 280, sm: 320 },
+  minWidth: 0,
+};
+
+const tooltipProps = {
+  contentStyle: {
+    borderRadius: 16,
+    border: "1px solid rgba(20, 17, 15, 0.1)",
+    boxShadow: "0 18px 50px rgba(20, 17, 15, 0.14)",
+  },
+};
+
 const DashboardCharts = () => {
   const dispatch = useDispatch();
 
@@ -92,7 +111,7 @@ const DashboardCharts = () => {
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2.5}>
       <Box>
         <Typography variant="h5" component="h2">
           Gráficos
@@ -110,23 +129,23 @@ const DashboardCharts = () => {
           display: "grid",
           gridTemplateColumns: {
             xs: "1fr",
-            md: "1fr 1fr",
+            lg: "1fr 1fr",
           },
-          gap: 2,
+          gap: 2.5,
         }}
       >
         <DashboardChartCard title="Gastos por categoría">
           {categoryChartData.length === 0 ? (
             <EmptyChartState />
           ) : (
-            <Box sx={{ width: "100%", height: 320, minWidth: 0 }}>
-              <ResponsiveContainer width="100%" height={320}>
+            <Box sx={chartSx}>
+              <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={categoryChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="amount" name="Monto" />
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                  <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
+                  <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
+                  <Tooltip {...tooltipProps} />
+                  <Bar dataKey="amount" name="Monto" fill={chartColor} radius={[10, 10, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Box>
@@ -137,18 +156,21 @@ const DashboardCharts = () => {
           {monthlyChartData.length === 0 ? (
             <EmptyChartState />
           ) : (
-            <Box sx={{ width: "100%", height: 320, minWidth: 0 }}>
-              <ResponsiveContainer width="100%" height={320}>
+            <Box sx={chartSx}>
+              <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={monthlyChartData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
+                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                  <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
+                  <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
+                  <Tooltip {...tooltipProps} />
                   <Line
                     type="monotone"
                     dataKey="amount"
                     name="Monto"
-                    strokeWidth={2}
+                    stroke={lineColor}
+                    strokeWidth={3}
+                    dot={{ r: 4, fill: chartColor, strokeWidth: 0 }}
+                    activeDot={{ r: 6, fill: chartColor, stroke: lineColor }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -161,14 +183,14 @@ const DashboardCharts = () => {
         {paymentMethodChartData.length === 0 ? (
           <EmptyChartState />
         ) : (
-          <Box sx={{ width: "100%", height: 320, minWidth: 0 }}>
-            <ResponsiveContainer width="100%" height={320}>
+          <Box sx={chartSx}>
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={paymentMethodChartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="amount" name="Monto" />
+                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
+                <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
+                <Tooltip {...tooltipProps} />
+                <Bar dataKey="amount" name="Monto" fill={chartColor} radius={[10, 10, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Box>
