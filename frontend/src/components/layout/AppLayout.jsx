@@ -9,12 +9,14 @@ import {
   Container,
   Divider,
   Drawer,
+  FormControlLabel,
   IconButton,
   List,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Stack,
+  Switch,
   Toolbar,
   Typography,
 } from "@mui/material";
@@ -24,6 +26,8 @@ import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
 import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
 import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
@@ -33,6 +37,7 @@ import {
   selectIsAdmin,
   selectUser,
 } from "../../features/auth/authSelectors.js";
+import { useThemeMode } from "../../theme/ThemeModeContext.js";
 
 const getNavItems = (isAdmin) => {
   if (isAdmin) {
@@ -73,12 +78,14 @@ const AppLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+  const { mode, toggleMode } = useThemeMode();
 
   const user = useSelector(selectUser);
   const isAdmin = useSelector(selectIsAdmin);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const navItems = getNavItems(isAdmin);
+  const isDark = mode === "dark";
 
   const handleLogout = () => {
     dispatch(logout());
@@ -93,6 +100,28 @@ const AppLayout = () => {
     return location.pathname === to || location.pathname.startsWith(`${to}/`);
   };
 
+  const modeSwitch = (
+    <FormControlLabel
+      sx={{ m: 0 }}
+      control={
+        <Switch
+          size="small"
+          checked={isDark}
+          onChange={toggleMode}
+          inputProps={{ "aria-label": "Cambiar modo oscuro" }}
+        />
+      }
+      label={
+        <Stack direction="row" spacing={0.75} alignItems="center">
+          {isDark ? <DarkModeOutlinedIcon fontSize="small" /> : <LightModeOutlinedIcon fontSize="small" />}
+          <Typography variant="body2" fontWeight={700}>
+            {isDark ? "Oscuro" : "Claro"}
+          </Typography>
+        </Stack>
+      }
+    />
+  );
+
   const drawerContent = (
     <Box sx={{ width: 300, p: 2.5 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
@@ -104,7 +133,7 @@ const AppLayout = () => {
               borderRadius: "50%",
               display: "grid",
               placeItems: "center",
-              color: "background.paper",
+              color: "primary.contrastText",
               bgcolor: "primary.main",
               fontWeight: 900,
               letterSpacing: "-0.08em",
@@ -133,6 +162,7 @@ const AppLayout = () => {
             sx={{
               borderRadius: 3,
               mb: 0.75,
+              minHeight: 48,
               "&.Mui-selected": {
                 color: "primary.contrastText",
                 bgcolor: "primary.main",
@@ -151,6 +181,8 @@ const AppLayout = () => {
       </List>
 
       <Divider sx={{ my: 2 }} />
+
+      <Box sx={{ mb: 1.5 }}>{modeSwitch}</Box>
 
       {user && (
         <Chip
@@ -178,26 +210,29 @@ const AppLayout = () => {
         position="sticky"
         color="transparent"
         elevation={0}
-        sx={{
+        sx={(theme) => ({
           borderBottom: "1px solid",
           borderColor: "divider",
           backdropFilter: "blur(22px)",
-          backgroundColor: "rgba(251, 248, 241, 0.78)",
-        }}
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? "rgba(2, 6, 23, 0.84)"
+              : "rgba(248, 251, 255, 0.84)",
+        })}
       >
         <Toolbar disableGutters>
           <Container
             maxWidth="xl"
             sx={{
               minHeight: { xs: 72, md: 82 },
-              display: "flex",
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr auto", md: "1fr auto 1fr" },
               alignItems: "center",
-              justifyContent: "space-between",
               gap: 2,
               px: { xs: 2, sm: 3, md: 5 },
             }}
           >
-            <Stack direction="row" spacing={1.5} alignItems="center">
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
               <IconButton
                 aria-label="Abrir navegación"
                 onClick={() => setMobileOpen(true)}
@@ -218,6 +253,7 @@ const AppLayout = () => {
                   textDecoration: "none",
                   fontWeight: 900,
                   letterSpacing: "-0.04em",
+                  whiteSpace: "nowrap",
                 }}
               >
                 <Box
@@ -228,11 +264,14 @@ const AppLayout = () => {
                     borderRadius: "50%",
                     display: "grid",
                     placeItems: "center",
-                    color: "background.paper",
+                    color: "primary.contrastText",
                     bgcolor: "primary.main",
                     fontSize: 14,
                     fontWeight: 900,
-                    boxShadow: "0 14px 30px rgba(20, 17, 15, 0.18)",
+                    boxShadow: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "0 14px 30px rgba(56, 189, 248, 0.2)"
+                        : "0 14px 30px rgba(15, 23, 42, 0.18)",
                   }}
                 >
                   EM
@@ -245,6 +284,7 @@ const AppLayout = () => {
               direction="row"
               spacing={0.75}
               alignItems="center"
+              justifyContent="center"
               sx={{ display: { xs: "none", md: "flex" } }}
             >
               {navItems.map((item) => {
@@ -257,12 +297,13 @@ const AppLayout = () => {
                     to={item.to}
                     startIcon={item.icon}
                     variant={active ? "contained" : "text"}
+                    size="small"
                     sx={{
-                      color: active ? "primary.contrastText" : "text.secondary",
+                      minHeight: 40,
                       px: 1.75,
+                      color: active ? "primary.contrastText" : "text.secondary",
                       "&:hover": {
                         color: active ? "primary.contrastText" : "text.primary",
-                        bgcolor: active ? "primary.main" : "rgba(20, 17, 15, 0.05)",
                       },
                     }}
                   >
@@ -272,14 +313,16 @@ const AppLayout = () => {
               })}
             </Stack>
 
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
+              <Box sx={{ display: { xs: "none", sm: "block" } }}>{modeSwitch}</Box>
+
               {user && (
                 <Chip
                   icon={<AccountCircleOutlinedIcon />}
                   label={`${user.username} · ${user.role}`}
                   size="small"
                   variant="outlined"
-                  sx={{ display: { xs: "none", sm: "inline-flex" } }}
+                  sx={{ display: { xs: "none", lg: "inline-flex" } }}
                 />
               )}
 
@@ -287,6 +330,7 @@ const AppLayout = () => {
                 variant="outlined"
                 startIcon={<LogoutRoundedIcon />}
                 onClick={handleLogout}
+                size="small"
                 sx={{ display: { xs: "none", sm: "inline-flex" } }}
               >
                 Salir
