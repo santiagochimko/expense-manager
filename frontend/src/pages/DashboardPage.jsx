@@ -16,10 +16,10 @@ const DashboardPage = () => {
           p: { xs: 3, sm: 4, md: 5 },
           overflow: "hidden",
           position: "relative",
-          color: "primary.contrastText",
+          color: "#f8fbff",
           bgcolor: "primary.main",
           background:
-            "radial-gradient(circle at 82% 10%, rgba(200, 169, 106, 0.38), transparent 28%), linear-gradient(135deg, #14110f 0%, #2f2a25 58%, #090807 100%)",
+            "radial-gradient(circle at 82% 10%, rgba(56, 189, 248, 0.34), transparent 28%), linear-gradient(135deg, #020617 0%, #0f172a 58%, #1d4ed8 100%)",
         }}
       >
         <Box
@@ -29,7 +29,7 @@ const DashboardPage = () => {
             width: 360,
             height: 360,
             borderRadius: "50%",
-            border: "1px solid rgba(200, 169, 106, 0.22)",
+            border: "1px solid rgba(56, 189, 248, 0.22)",
           }}
         />
 
@@ -45,8 +45,8 @@ const DashboardPage = () => {
               label="Panorama financiero"
               sx={{
                 width: "fit-content",
-                color: "secondary.contrastText",
-                bgcolor: "secondary.main",
+                color: "#020617",
+                bgcolor: "#38bdf8",
               }}
             />
 
@@ -58,7 +58,7 @@ const DashboardPage = () => {
               Resumen elegante de tus gastos.
             </Typography>
 
-            <Typography sx={{ color: "rgba(255, 253, 248, 0.72)", maxWidth: 560 }}>
+            <Typography sx={{ color: "rgba(248, 251, 255, 0.74)", maxWidth: 560 }}>
               Visualizá el estado general, detectá patrones y accedé rápido a las gestiones principales.
             </Typography>
           </Stack>
@@ -70,11 +70,11 @@ const DashboardPage = () => {
               variant="contained"
               startIcon={<AddRoundedIcon />}
               sx={{
-                bgcolor: "secondary.main",
-                color: "secondary.contrastText",
-                background: "linear-gradient(135deg, #d8bd7b, #b38b46)",
+                bgcolor: "#38bdf8",
+                color: "#020617",
+                background: "linear-gradient(135deg, #38bdf8, #2563eb)",
                 "&:hover": {
-                  bgcolor: "secondary.dark",
+                  bgcolor: "#2563eb",
                 },
               }}
             >
@@ -87,12 +87,12 @@ const DashboardPage = () => {
               variant="outlined"
               startIcon={<CategoryOutlinedIcon />}
               sx={{
-                color: "primary.contrastText",
-                borderColor: "rgba(255, 253, 248, 0.22)",
-                backgroundColor: "rgba(255, 253, 248, 0.08)",
+                color: "#f8fbff",
+                borderColor: "rgba(248, 251, 255, 0.24)",
+                backgroundColor: "rgba(248, 251, 255, 0.08)",
                 "&:hover": {
-                  borderColor: "rgba(255, 253, 248, 0.42)",
-                  backgroundColor: "rgba(255, 253, 248, 0.12)",
+                  borderColor: "rgba(56, 189, 248, 0.55)",
+                  backgroundColor: "rgba(56, 189, 248, 0.12)",
                 },
               }}
             >
