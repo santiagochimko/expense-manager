@@ -30,6 +30,7 @@ const ExpensesFilters = ({
     },
     validationSchema: filtersSchema,
     enableReinitialize: true,
+    validateOnChange: false,
     onSubmit: (values) => {
       const nextFilters = {
         search: values.search.trim(),
@@ -57,10 +58,11 @@ const ExpensesFilters = ({
 
   return (
     <Stack
-      direction={{ xs: "column", md: "row" }}
-      spacing={2}
+      direction={{ xs: "column", lg: "row" }}
+      spacing={1.5}
       component="form"
       onSubmit={formik.handleSubmit}
+      alignItems={{ xs: "stretch", lg: "flex-start" }}
     >
       <TextField
         label="Buscar"
@@ -72,6 +74,7 @@ const ExpensesFilters = ({
         placeholder="Buscar por título"
         error={Boolean(formik.touched.search) && Boolean(formik.errors.search)}
         helperText={formik.touched.search ? formik.errors.search : ""}
+        sx={{ flex: { lg: 1.3 } }}
       />
 
       <FormControl
@@ -79,6 +82,7 @@ const ExpensesFilters = ({
         error={
           Boolean(formik.touched.category) && Boolean(formik.errors.category)
         }
+        sx={{ flex: { lg: 1 } }}
       >
         <InputLabel id="filter-category-label">Categoría</InputLabel>
 
@@ -104,13 +108,15 @@ const ExpensesFilters = ({
         )}
       </FormControl>
 
-      <Button type="submit" variant="contained" disabled={!formik.isValid}>
-        Aplicar
-      </Button>
+      <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+        <Button type="submit" variant="contained" disabled={!formik.isValid}>
+          Aplicar
+        </Button>
 
-      <Button type="button" variant="outlined" onClick={handleClear}>
-        Limpiar
-      </Button>
+        <Button type="button" variant="outlined" onClick={handleClear}>
+          Limpiar
+        </Button>
+      </Stack>
     </Stack>
   );
 };

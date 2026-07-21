@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Alert,
   Box,
-  Button,
   CircularProgress,
   Paper,
   Stack,
@@ -109,10 +108,6 @@ const CategoriesSection = () => {
     }
   };
 
-  const handleReload = () => {
-    dispatch(fetchCategories());
-  };
-
   if (loading && categories.length === 0) {
     return (
       <Paper sx={{ p: 3 }}>
@@ -125,30 +120,7 @@ const CategoriesSection = () => {
 
   return (
     <>
-      <Stack spacing={2}>
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 2,
-          }}
-        >
-          <div>
-            <Typography variant="h5" component="h2">
-              Categorías
-            </Typography>
-
-            <Typography color="text.secondary">
-              Creá y administrá categorías para clasificar tus gastos.
-            </Typography>
-          </div>
-
-          <Button variant="outlined" onClick={handleReload} disabled={loading}>
-            Actualizar
-          </Button>
-        </Box>
-
+      <Stack spacing={3}>
         {error && <Alert severity="error">{error}</Alert>}
 
         <Box
@@ -156,15 +128,21 @@ const CategoriesSection = () => {
             display: "grid",
             gridTemplateColumns: {
               xs: "1fr",
-              md: "minmax(280px, 420px) 1fr",
+              lg: "minmax(300px, 420px) 1fr",
             },
-            gap: 3,
+            gap: { xs: 2.5, md: 3 },
+            alignItems: "start",
           }}
         >
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" component="h3" gutterBottom>
-              {selectedCategory ? "Editar categoría" : "Nueva categoría"}
-            </Typography>
+          <Paper sx={{ p: { xs: 2.5, sm: 3 }, position: { lg: "sticky" }, top: 108 }}>
+            <Stack spacing={0.75} sx={{ mb: 2.5 }}>
+              <Typography variant="h6" component="h2">
+                {selectedCategory ? "Editar categoría" : "Nueva categoría"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Definí nombre, descripción y color para mantener tus gastos ordenados.
+              </Typography>
+            </Stack>
 
             <CategoryForm
               key={`${selectedCategory?._id || "new-category"}-${formResetKey}`}

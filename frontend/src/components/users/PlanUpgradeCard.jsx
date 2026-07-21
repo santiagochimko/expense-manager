@@ -8,6 +8,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import WorkspacePremiumOutlinedIcon from "@mui/icons-material/WorkspacePremiumOutlined";
 import { useDispatch, useSelector } from "react-redux";
 
 import { clearAuthError } from "../../features/auth/authSlice.js";
@@ -52,25 +53,66 @@ const PlanUpgradeCard = () => {
   }
 
   return (
-    <Paper sx={{ p: 3 }}>
-      <Stack spacing={2}>
+    <Paper
+      sx={{
+        p: { xs: 2.5, sm: 3 },
+        overflow: "hidden",
+        position: "relative",
+      }}
+    >
+      <Box
+        sx={(theme) => ({
+          position: "absolute",
+          top: -70,
+          right: -50,
+          width: 180,
+          height: 180,
+          borderRadius: "50%",
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? "rgba(56, 189, 248, 0.12)"
+              : "rgba(37, 99, 235, 0.1)",
+        })}
+      />
+
+      <Stack spacing={2} sx={{ position: "relative" }}>
         <Box
           sx={{
             display: "flex",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: { xs: "flex-start", sm: "center" },
+            flexDirection: { xs: "column", sm: "row" },
             gap: 2,
           }}
         >
-          <div>
-            <Typography variant="h6" component="h2">
-              Plan de usuario
-            </Typography>
+          <Stack direction="row" spacing={1.5} alignItems="center">
+            <Box
+              sx={(theme) => ({
+                width: 44,
+                height: 44,
+                borderRadius: "50%",
+                display: "grid",
+                placeItems: "center",
+                bgcolor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(56, 189, 248, 0.16)"
+                    : "rgba(37, 99, 235, 0.12)",
+                color: "secondary.main",
+              })}
+            >
+              <WorkspacePremiumOutlinedIcon />
+            </Box>
 
-            <Typography color="text.secondary">
-              Gestioná el plan asociado a tu cuenta.
-            </Typography>
-          </div>
+            <div>
+              <Typography variant="h6" component="h2">
+                Plan de usuario
+              </Typography>
+
+              <Typography color="text.secondary">
+                Gestioná el alcance asociado a tu cuenta.
+              </Typography>
+            </div>
+          </Stack>
 
           <Chip
             label={user.plan === "premium" ? "Premium" : "Plus"}
@@ -88,21 +130,24 @@ const PlanUpgradeCard = () => {
             Ya tenés el plan premium activo. No tenés límite de gastos.
           </Alert>
         ) : (
-          <Stack spacing={1}>
-            <Typography>
-              El plan Plus tiene un límite de gastos activos. Con Premium podés
-              registrar gastos sin ese límite.
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            alignItems={{ xs: "stretch", md: "center" }}
+            justifyContent="space-between"
+          >
+            <Typography color="text.secondary" maxWidth={720}>
+              El plan Plus tiene un límite de gastos activos. Con Premium podés registrar gastos sin ese límite.
             </Typography>
 
-            <Box>
-              <Button
-                variant="contained"
-                onClick={handleUpgrade}
-                disabled={loading}
-              >
-                {loading ? "Actualizando..." : "Actualizar a Premium"}
-              </Button>
-            </Box>
+            <Button
+              variant="contained"
+              onClick={handleUpgrade}
+              disabled={loading}
+              sx={{ whiteSpace: "nowrap" }}
+            >
+              {loading ? "Actualizando..." : "Actualizar a Premium"}
+            </Button>
           </Stack>
         )}
       </Stack>

@@ -1,4 +1,5 @@
-import { Link as RouterLink, Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link as RouterLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AppBar,
@@ -6,93 +7,401 @@ import {
   Button,
   Chip,
   Container,
+  Divider,
+  Drawer,
+  IconButton,
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   Stack,
   Toolbar,
   Typography,
 } from "@mui/material";
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
+import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
+import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import CurrencyExchangeOutlinedIcon from "@mui/icons-material/CurrencyExchangeOutlined";
+import DashboardOutlinedIcon from "@mui/icons-material/DashboardOutlined";
+import DarkModeOutlinedIcon from "@mui/icons-material/DarkModeOutlined";
+import LightModeOutlinedIcon from "@mui/icons-material/LightModeOutlined";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
 import { logout } from "../../features/auth/authSlice.js";
 import {
   selectIsAdmin,
   selectUser,
 } from "../../features/auth/authSelectors.js";
+import { useThemeMode } from "../../theme/ThemeModeContext.js";
+
+const getNavItems = (isAdmin) => {
+  if (isAdmin) {
+    return [
+      {
+        label: "Dashboard admin",
+        to: "/admin/dashboard",
+        icon: <AdminPanelSettingsOutlinedIcon fontSize="small" />,
+      },
+    ];
+  }
+
+  return [
+    {
+      label: "Dashboard",
+      to: "/dashboard",
+      icon: <DashboardOutlinedIcon fontSize="small" />,
+    },
+    {
+      label: "Categorías",
+      to: "/categories",
+      icon: <CategoryOutlinedIcon fontSize="small" />,
+    },
+    {
+      label: "Gastos",
+      to: "/expenses",
+      icon: <ReceiptLongOutlinedIcon fontSize="small" />,
+    },
+    {
+      label: "Tipo de cambio",
+      to: "/exchange-rates",
+      icon: <CurrencyExchangeOutlinedIcon fontSize="small" />,
+    },
+  ];
+};
 
 const AppLayout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { mode, toggleMode } = useThemeMode();
 
   const user = useSelector(selectUser);
   const isAdmin = useSelector(selectIsAdmin);
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const navItems = getNavItems(isAdmin);
+  const isDark = mode === "dark";
 
   const handleLogout = () => {
     dispatch(logout());
     navigate("/login", { replace: true });
   };
 
-  return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
-      <AppBar position="static" color="inherit" elevation={1}>
-        <Toolbar>
-          <Container
-            maxWidth="lg"
+  const handleCloseMobile = () => {
+    setMobileOpen(false);
+  };
+
+  const isActive = (to) => {
+    return location.pathname === to || location.pathname.startsWith(`${to}/`);
+  };
+
+  const modeToggle = (
+    <Box
+      component="button"
+      type="button"
+      onClick={toggleMode}
+      aria-label="Cambiar modo oscuro"
+      aria-pressed={isDark}
+      sx={{
+        height: 40,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 0.75,
+        p: 0,
+        border: 0,
+        bgcolor: "transparent",
+        color: "text.primary",
+        cursor: "pointer",
+        font: "inherit",
+        lineHeight: 1,
+        flexShrink: 0,
+      }}
+    >
+      <Box
+        component="span"
+        sx={(theme) => ({
+          width: 38,
+          height: 22,
+          display: "flex",
+          alignItems: "center",
+          p: "2px",
+          borderRadius: 999,
+          bgcolor: isDark ? theme.palette.primary.main : "rgba(15, 23, 42, 0.34)",
+          transition: "background-color 160ms ease",
+        })}
+      >
+        <Box
+          component="span"
+          sx={(theme) => ({
+            width: 18,
+            height: 18,
+            borderRadius: "50%",
+            bgcolor: isDark ? theme.palette.primary.contrastText : "#ffffff",
+            transform: isDark ? "translateX(16px)" : "translateX(0)",
+            transition: "transform 160ms ease",
+            boxShadow: "0 1px 4px rgba(15, 23, 42, 0.26)",
+          })}
+        />
+      </Box>
+
+      {isDark ? (
+        <DarkModeOutlinedIcon fontSize="small" sx={{ display: "block" }} />
+      ) : (
+        <LightModeOutlinedIcon fontSize="small" sx={{ display: "block" }} />
+      )}
+
+      <Typography variant="body2" fontWeight={700} sx={{ lineHeight: 1 }}>
+        {isDark ? "Oscuro" : "Claro"}
+      </Typography>
+    </Box>
+  );
+
+  const drawerContent = (
+    <Box sx={{ width: 300, p: 2.5 }}>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+        <Stack direction="row" spacing={1.5} alignItems="center">
+          <Box
             sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 2,
+              width: 38,
+              height: 38,
+              borderRadius: "50%",
+              display: "grid",
+              placeItems: "center",
+              color: "primary.contrastText",
+              bgcolor: "primary.main",
+              fontWeight: 900,
+              letterSpacing: "-0.08em",
             }}
           >
-            <Typography
-              component={RouterLink}
-              to={isAdmin ? "/admin/dashboard" : "/dashboard"}
-              variant="h6"
-              color="text.primary"
-              sx={{
-                textDecoration: "none",
-                fontWeight: 700,
-              }}
-            >
-              Expense Manager
-            </Typography>
+            EM
+          </Box>
+          <Typography variant="h6">Expense Manager</Typography>
+        </Stack>
 
-            <Stack direction="row" spacing={1} alignItems="center">
-              {isAdmin ? (
-                <>
-                  <Button component={RouterLink} to="/admin/dashboard">
-                    Dashboard admin
-                  </Button>                  
-                </>
-              ) : (
-                <>
-                  <Button component={RouterLink} to="/dashboard">
-                    Dashboard
-                  </Button>
+        <IconButton onClick={handleCloseMobile} aria-label="Cerrar navegación">
+          <CloseRoundedIcon />
+        </IconButton>
+      </Stack>
 
-                  <Button component={RouterLink} to="/categories">
-                    Categorías
-                  </Button>
+      <Divider sx={{ mb: 1.5 }} />
 
-                  <Button component={RouterLink} to="/expenses">
-                    Gastos
-                  </Button>
+      <List disablePadding>
+        {navItems.map((item) => (
+          <ListItemButton
+            key={item.to}
+            component={RouterLink}
+            to={item.to}
+            onClick={handleCloseMobile}
+            selected={isActive(item.to)}
+            sx={{
+              borderRadius: 3,
+              mb: 0.75,
+              minHeight: 48,
+              "&.Mui-selected": {
+                color: "primary.contrastText",
+                bgcolor: "primary.main",
+                "&:hover": {
+                  bgcolor: "primary.light",
+                },
+              },
+            }}
+          >
+            <ListItemIcon sx={{ minWidth: 38, color: "inherit" }}>
+              {item.icon}
+            </ListItemIcon>
+            <ListItemText primary={item.label} />
+          </ListItemButton>
+        ))}
+      </List>
 
-                  <Button component={RouterLink} to="/exchange-rates">
-                    Tipo de cambio
-                  </Button>
-                </>
-              )}
+      <Divider sx={{ my: 2 }} />
+
+      <Box sx={{ mb: 1.5 }}>{modeToggle}</Box>
+
+      {user && (
+        <Chip
+          icon={<AccountCircleOutlinedIcon />}
+          label={`${user.username} · ${user.role}`}
+          variant="outlined"
+          sx={{ width: "100%", justifyContent: "flex-start", mb: 1.5 }}
+        />
+      )}
+
+      <Button
+        fullWidth
+        variant="outlined"
+        startIcon={<LogoutRoundedIcon />}
+        onClick={handleLogout}
+      >
+        Salir
+      </Button>
+    </Box>
+  );
+
+  return (
+    <Box sx={{ minHeight: "100vh", color: "text.primary" }}>
+      <AppBar
+        position="sticky"
+        color="transparent"
+        elevation={0}
+        sx={(theme) => ({
+          borderBottom: "1px solid",
+          borderColor: "divider",
+          backdropFilter: "blur(22px)",
+          backgroundColor:
+            theme.palette.mode === "dark"
+              ? "rgba(2, 6, 23, 0.84)"
+              : "rgba(248, 251, 255, 0.84)",
+        })}
+      >
+        <Toolbar disableGutters sx={{ minHeight: { xs: 72, md: 80 } }}>
+          <Container
+            maxWidth="xl"
+            sx={{
+              minHeight: { xs: 72, md: 80 },
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr auto", md: "1fr auto 1fr" },
+              alignItems: "center",
+              columnGap: 2,
+              px: { xs: 2, sm: 3, md: 5 },
+            }}
+          >
+            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ minWidth: 0 }}>
+              <IconButton
+                aria-label="Abrir navegación"
+                onClick={() => setMobileOpen(true)}
+                sx={{ display: { xs: "inline-flex", md: "none" }, mr: 0.5 }}
+              >
+                <MenuRoundedIcon />
+              </IconButton>
+
+              <Typography
+                component={RouterLink}
+                to={isAdmin ? "/admin/dashboard" : "/dashboard"}
+                variant="h6"
+                color="text.primary"
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.25,
+                  textDecoration: "none",
+                  fontWeight: 900,
+                  letterSpacing: "-0.04em",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                <Box
+                  component="span"
+                  sx={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    display: "grid",
+                    placeItems: "center",
+                    color: "primary.contrastText",
+                    bgcolor: "primary.main",
+                    fontSize: 14,
+                    fontWeight: 900,
+                    boxShadow: (theme) =>
+                      theme.palette.mode === "dark"
+                        ? "0 14px 30px rgba(56, 189, 248, 0.2)"
+                        : "0 14px 30px rgba(15, 23, 42, 0.18)",
+                  }}
+                >
+                  EM
+                </Box>
+                Expense Manager
+              </Typography>
             </Stack>
 
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack
+              direction="row"
+              spacing={0.75}
+              alignItems="center"
+              justifyContent="center"
+              sx={{ display: { xs: "none", md: "flex" }, height: 40 }}
+            >
+              {navItems.map((item) => {
+                const active = isActive(item.to);
+
+                return (
+                  <Button
+                    key={item.to}
+                    component={RouterLink}
+                    to={item.to}
+                    startIcon={item.icon}
+                    variant={active ? "contained" : "text"}
+                    size="small"
+                    sx={{
+                      minHeight: 40,
+                      height: 40,
+                      px: 1.75,
+                      color: active ? "primary.contrastText" : "text.secondary",
+                      "&:hover": {
+                        color: active ? "primary.contrastText" : "text.primary",
+                      },
+                    }}
+                  >
+                    {item.label}
+                  </Button>
+                );
+              })}
+            </Stack>
+
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              justifyContent="flex-end"
+              sx={{ height: 40, minWidth: 0 }}
+            >
+              <Box
+                sx={{
+                  display: { xs: "none", sm: "flex" },
+                  alignItems: "center",
+                  height: 40,
+                }}
+              >
+                {modeToggle}
+              </Box>
+
               {user && (
                 <Chip
+                  icon={<AccountCircleOutlinedIcon />}
                   label={`${user.username} · ${user.role}`}
                   size="small"
                   variant="outlined"
+                  sx={{
+                    display: { xs: "none", lg: "inline-flex" },
+                    alignItems: "center",
+                    height: 36,
+                    maxWidth: 170,
+                    "& .MuiChip-label": {
+                      display: "block",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    },
+                  }}
                 />
               )}
 
-              <Button variant="outlined" onClick={handleLogout}>
+              <Button
+                variant="outlined"
+                startIcon={<LogoutRoundedIcon />}
+                onClick={handleLogout}
+                size="small"
+                sx={{
+                  display: { xs: "none", sm: "inline-flex" },
+                  alignItems: "center",
+                  minHeight: 40,
+                  height: 40,
+                  px: 2,
+                }}
+              >
                 Salir
               </Button>
             </Stack>
@@ -100,7 +409,30 @@ const AppLayout = () => {
         </Toolbar>
       </AppBar>
 
-      <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Drawer
+        anchor="left"
+        open={mobileOpen}
+        onClose={handleCloseMobile}
+        slotProps={{
+          paper: {
+            sx: {
+              bgcolor: "background.paper",
+              borderTopRightRadius: 28,
+              borderBottomRightRadius: 28,
+            },
+          },
+        }}
+      >
+        {drawerContent}
+      </Drawer>
+
+      <Container
+        maxWidth="xl"
+        sx={{
+          px: { xs: 2, sm: 3, md: 5 },
+          py: { xs: 3, md: 5 },
+        }}
+      >
         <Outlet />
       </Container>
     </Box>
