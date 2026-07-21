@@ -7,6 +7,7 @@ import {
   Paper,
   Stack,
   Typography,
+  useTheme,
 } from "@mui/material";
 import {
   Bar,
@@ -28,11 +29,6 @@ import {
   selectDashboardLoading,
 } from "../../features/dashboard/dashboardSelectors.js";
 import { fetchDashboardCharts } from "../../features/dashboard/dashboardThunks.js";
-
-const chartColor = "#c8a96a";
-const lineColor = "#14110f";
-const gridColor = "rgba(20, 17, 15, 0.08)";
-const axisColor = "#7b7166";
 
 const getCategoryChartData = (charts) => {
   const expensesByCategory = charts?.expensesByCategory || [];
@@ -77,16 +73,9 @@ const chartSx = {
   minWidth: 0,
 };
 
-const tooltipProps = {
-  contentStyle: {
-    borderRadius: 16,
-    border: "1px solid rgba(20, 17, 15, 0.1)",
-    boxShadow: "0 18px 50px rgba(20, 17, 15, 0.14)",
-  },
-};
-
 const DashboardCharts = () => {
   const dispatch = useDispatch();
+  const theme = useTheme();
 
   const charts = useSelector(selectDashboardCharts);
   const loading = useSelector(selectDashboardLoading);
@@ -99,6 +88,23 @@ const DashboardCharts = () => {
   const categoryChartData = getCategoryChartData(charts);
   const monthlyChartData = getMonthlyChartData(charts);
   const paymentMethodChartData = getPaymentMethodChartData(charts);
+
+  const chartColor = theme.palette.secondary.main;
+  const lineColor = theme.palette.primary.main;
+  const gridColor = theme.palette.divider;
+  const axisColor = theme.palette.text.secondary;
+  const tooltipProps = {
+    contentStyle: {
+      borderRadius: 16,
+      border: `1px solid ${theme.palette.divider}`,
+      background: theme.palette.background.paper,
+      color: theme.palette.text.primary,
+      boxShadow:
+        theme.palette.mode === "dark"
+          ? "0 18px 50px rgba(0, 0, 0, 0.34)"
+          : "0 18px 50px rgba(15, 23, 42, 0.14)",
+    },
+  };
 
   if (loading && !charts) {
     return (
