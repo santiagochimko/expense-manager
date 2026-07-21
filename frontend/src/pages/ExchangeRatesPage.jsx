@@ -98,7 +98,12 @@ const ExchangeRatesPage = () => {
           </Typography>
         </div>
 
-        <Button variant="outlined" onClick={handleReload} disabled={loading}>
+        <Button
+          variant="outlined"
+          onClick={handleReload}
+          disabled={loading}
+          sx={{ minHeight: 42, height: 42, alignSelf: "center" }}
+        >
           Actualizar
         </Button>
       </Box>
@@ -107,7 +112,11 @@ const ExchangeRatesPage = () => {
 
       <Paper sx={{ p: 3 }}>
         <Box component="form" onSubmit={formik.handleSubmit}>
-          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={2}
+            alignItems={{ xs: "stretch", md: "center" }}
+          >
             <FormControl
               fullWidth
               error={Boolean(formik.touched.base) && Boolean(formik.errors.base)}
@@ -136,7 +145,19 @@ const ExchangeRatesPage = () => {
               </FormHelperText>
             </FormControl>
 
-            <Button type="submit" variant="contained" disabled={loading}>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={loading}
+              sx={{
+                minHeight: 42,
+                height: 42,
+                px: 2.75,
+                alignSelf: { xs: "stretch", md: "center" },
+                flexShrink: 0,
+                width: { xs: "100%", md: "auto" },
+              }}
+            >
               {loading ? "Consultando..." : "Consultar"}
             </Button>
           </Stack>
