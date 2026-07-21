@@ -24,14 +24,14 @@ const getInitialValues = (selectedCategory) => {
     return {
       name: selectedCategory.name || "",
       description: selectedCategory.description || "",
-      color: selectedCategory.color || "#1976d2",
+      color: selectedCategory.color || "#c8a96a",
     };
   }
 
   return {
     name: "",
     description: "",
-    color: "#1976d2",
+    color: "#c8a96a",
   };
 };
 
@@ -54,6 +54,7 @@ const CategoryForm = ({
     initialValues: getInitialValues(selectedCategory),
     validationSchema: categorySchema,
     enableReinitialize: true,
+    validateOnChange: false,
     onSubmit: (values) => {
       onSubmit({
         name: values.name.trim(),
@@ -77,7 +78,7 @@ const CategoryForm = ({
 
   return (
     <Box component="form" onSubmit={formik.handleSubmit}>
-      <Stack spacing={2}>
+      <Stack spacing={2.25}>
         <TextField
           label="Nombre"
           name="name"
@@ -116,13 +117,20 @@ const CategoryForm = ({
           required
           error={Boolean(colorError)}
           helperText={colorError || "Color identificador de la categoría"}
+          sx={{
+            "& input": {
+              minHeight: 48,
+              cursor: "pointer",
+            },
+          }}
         />
 
-        <Stack direction="row" spacing={1}>
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25}>
           <Button
             type="submit"
             variant="contained"
-            disabled={!formik.isValid || saving}
+            disabled={saving}
+            fullWidth={!selectedCategory}
           >
             {saving
               ? "Guardando..."
