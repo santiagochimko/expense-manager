@@ -9,9 +9,11 @@ import DashboardCharts from "../components/dashboard/DashboardCharts.jsx";
 import PlanUpgradeCard from "../components/users/PlanUpgradeCard.jsx";
 
 const ctaButtonSx = {
-  minHeight: 42,
-  height: 42,
+  minHeight: 40,
+  height: 40,
+  py: 0,
   px: 2.25,
+  flexShrink: 0,
   alignSelf: { xs: "stretch", sm: "center" },
   width: { xs: "100%", sm: "auto" },
 };
@@ -41,14 +43,20 @@ const DashboardPage = () => {
           }}
         />
 
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          justifyContent="space-between"
-          alignItems={{ xs: "flex-start", md: "center" }}
-          spacing={3}
-          sx={{ position: "relative" }}
+        <Box
+          sx={{
+            position: "relative",
+            width: "100%",
+            display: "grid",
+            gridTemplateColumns: {
+              xs: "1fr",
+              md: "minmax(0, 1fr) auto",
+            },
+            alignItems: "center",
+            gap: { xs: 3, md: 4 },
+          }}
         >
-          <Stack spacing={2} maxWidth={680}>
+          <Stack spacing={2} maxWidth={680} sx={{ minWidth: 0 }}>
             <Chip
               label="Panorama financiero"
               sx={{
@@ -75,8 +83,11 @@ const DashboardPage = () => {
             direction={{ xs: "column", sm: "row" }}
             spacing={1.5}
             alignItems={{ xs: "stretch", sm: "center" }}
-            justifyContent="center"
-            width={{ xs: "100%", sm: "auto" }}
+            justifyContent={{ xs: "flex-start", md: "flex-end" }}
+            sx={{
+              width: { xs: "100%", sm: "auto" },
+              justifySelf: { xs: "stretch", md: "end" },
+            }}
           >
             <Button
               component={RouterLink}
@@ -115,7 +126,7 @@ const DashboardPage = () => {
               Categorías
             </Button>
           </Stack>
-        </Stack>
+        </Box>
       </Paper>
 
       <PlanUpgradeCard />
@@ -145,7 +156,7 @@ const DashboardPage = () => {
           to="/expenses"
           variant="outlined"
           startIcon={<ReceiptLongOutlinedIcon />}
-          sx={{ minHeight: 42, height: 42 }}
+          sx={{ minHeight: 40, height: 40, py: 0 }}
         >
           Ver gastos
         </Button>
