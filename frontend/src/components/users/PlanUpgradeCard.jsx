@@ -61,15 +61,18 @@ const PlanUpgradeCard = () => {
       }}
     >
       <Box
-        sx={{
+        sx={(theme) => ({
           position: "absolute",
           top: -70,
           right: -50,
           width: 180,
           height: 180,
           borderRadius: "50%",
-          bgcolor: "rgba(200, 169, 106, 0.12)",
-        }}
+          bgcolor:
+            theme.palette.mode === "dark"
+              ? "rgba(56, 189, 248, 0.12)"
+              : "rgba(37, 99, 235, 0.1)",
+        })}
       />
 
       <Stack spacing={2} sx={{ position: "relative" }}>
@@ -84,15 +87,18 @@ const PlanUpgradeCard = () => {
         >
           <Stack direction="row" spacing={1.5} alignItems="center">
             <Box
-              sx={{
+              sx={(theme) => ({
                 width: 44,
                 height: 44,
                 borderRadius: "50%",
                 display: "grid",
                 placeItems: "center",
-                bgcolor: "rgba(200, 169, 106, 0.16)",
-                color: "secondary.dark",
-              }}
+                bgcolor:
+                  theme.palette.mode === "dark"
+                    ? "rgba(56, 189, 248, 0.16)"
+                    : "rgba(37, 99, 235, 0.12)",
+                color: "secondary.main",
+              })}
             >
               <WorkspacePremiumOutlinedIcon />
             </Box>
