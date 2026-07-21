@@ -9,7 +9,6 @@ import {
   Container,
   Divider,
   Drawer,
-  FormControlLabel,
   IconButton,
   List,
   ListItemButton,
@@ -101,25 +100,29 @@ const AppLayout = () => {
   };
 
   const modeSwitch = (
-    <FormControlLabel
-      sx={{ m: 0 }}
-      control={
-        <Switch
-          size="small"
-          checked={isDark}
-          onChange={toggleMode}
-          inputProps={{ "aria-label": "Cambiar modo oscuro" }}
-        />
-      }
-      label={
-        <Stack direction="row" spacing={0.75} alignItems="center">
-          {isDark ? <DarkModeOutlinedIcon fontSize="small" /> : <LightModeOutlinedIcon fontSize="small" />}
-          <Typography variant="body2" fontWeight={700}>
-            {isDark ? "Oscuro" : "Claro"}
-          </Typography>
-        </Stack>
-      }
-    />
+    <Stack
+      direction="row"
+      spacing={0.75}
+      alignItems="center"
+      sx={{ height: 40, flexShrink: 0 }}
+    >
+      <Switch
+        size="small"
+        checked={isDark}
+        onChange={toggleMode}
+        inputProps={{ "aria-label": "Cambiar modo oscuro" }}
+      />
+
+      {isDark ? (
+        <DarkModeOutlinedIcon fontSize="small" />
+      ) : (
+        <LightModeOutlinedIcon fontSize="small" />
+      )}
+
+      <Typography variant="body2" fontWeight={700} lineHeight={1}>
+        {isDark ? "Oscuro" : "Claro"}
+      </Typography>
+    </Stack>
   );
 
   const drawerContent = (
@@ -300,6 +303,7 @@ const AppLayout = () => {
                     size="small"
                     sx={{
                       minHeight: 40,
+                      height: 40,
                       px: 1.75,
                       color: active ? "primary.contrastText" : "text.secondary",
                       "&:hover": {
@@ -313,8 +317,16 @@ const AppLayout = () => {
               })}
             </Stack>
 
-            <Stack direction="row" spacing={1} alignItems="center" justifyContent="flex-end">
-              <Box sx={{ display: { xs: "none", sm: "block" } }}>{modeSwitch}</Box>
+            <Stack
+              direction="row"
+              spacing={1}
+              alignItems="center"
+              justifyContent="flex-end"
+              sx={{ minHeight: 40 }}
+            >
+              <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
+                {modeSwitch}
+              </Box>
 
               {user && (
                 <Chip
@@ -322,7 +334,11 @@ const AppLayout = () => {
                   label={`${user.username} · ${user.role}`}
                   size="small"
                   variant="outlined"
-                  sx={{ display: { xs: "none", lg: "inline-flex" } }}
+                  sx={{
+                    display: { xs: "none", lg: "inline-flex" },
+                    alignItems: "center",
+                    height: 32,
+                  }}
                 />
               )}
 
@@ -331,7 +347,11 @@ const AppLayout = () => {
                 startIcon={<LogoutRoundedIcon />}
                 onClick={handleLogout}
                 size="small"
-                sx={{ display: { xs: "none", sm: "inline-flex" } }}
+                sx={{
+                  display: { xs: "none", sm: "inline-flex" },
+                  minHeight: 40,
+                  height: 40,
+                }}
               >
                 Salir
               </Button>
