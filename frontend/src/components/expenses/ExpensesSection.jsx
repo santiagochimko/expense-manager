@@ -211,17 +211,7 @@ const ExpensesSection = () => {
 
   return (
     <>
-      <Stack spacing={2}>
-        <Box>
-          <Typography variant="h5" component="h2">
-            Gastos
-          </Typography>
-
-          <Typography color="text.secondary">
-            Registrá, filtrá y administrá tus gastos.
-          </Typography>
-        </Box>
-
+      <Stack spacing={3}>
         {error && <Alert severity="error">{error}</Alert>}
 
         <Box
@@ -229,20 +219,25 @@ const ExpensesSection = () => {
             display: "grid",
             gridTemplateColumns: {
               xs: "1fr",
-              md: "minmax(280px, 420px) 1fr",
+              xl: "minmax(320px, 460px) 1fr",
             },
-            gap: 3,
+            gap: { xs: 2.5, md: 3 },
+            alignItems: "start",
           }}
         >
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" component="h3" gutterBottom>
-              {selectedExpense ? "Editar gasto" : "Nuevo gasto"}
-            </Typography>
+          <Paper sx={{ p: { xs: 2.5, sm: 3 }, position: { xl: "sticky" }, top: 108 }}>
+            <Stack spacing={0.75} sx={{ mb: 2.5 }}>
+              <Typography variant="h6" component="h2">
+                {selectedExpense ? "Editar gasto" : "Nuevo gasto"}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Registrá movimientos con categoría, método de pago y comprobante opcional.
+              </Typography>
+            </Stack>
 
             {categories.length === 0 ? (
               <Alert severity="info">
-                Para crear gastos primero necesitás crear al menos una
-                categoría.
+                Para crear gastos primero necesitás crear al menos una categoría.
               </Alert>
             ) : (
               <ExpenseForm
@@ -261,11 +256,16 @@ const ExpensesSection = () => {
             )}
           </Paper>
 
-          <Stack spacing={2}>
-            <Paper sx={{ p: 3 }}>
-              <Typography variant="h6" component="h3" gutterBottom>
-                Filtros
-              </Typography>
+          <Stack spacing={2.5}>
+            <Paper sx={{ p: { xs: 2.5, sm: 3 } }}>
+              <Stack spacing={0.75} sx={{ mb: 2.5 }}>
+                <Typography variant="h6" component="h2">
+                  Filtros
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Buscá por título o filtrá por categoría sin perder el contexto del paginado.
+                </Typography>
+              </Stack>
 
               <ExpensesFilters
                 filters={localFilters}
