@@ -110,10 +110,10 @@ const LoginPage = () => {
             justifyContent: "space-between",
             overflow: "hidden",
             position: "relative",
-            color: "primary.contrastText",
+            color: "#f8fbff",
             bgcolor: "primary.main",
             background:
-              "radial-gradient(circle at 20% 10%, rgba(200, 169, 106, 0.45), transparent 28%), linear-gradient(145deg, #14110f 0%, #2f2a25 52%, #090807 100%)",
+              "radial-gradient(circle at 20% 10%, rgba(56, 189, 248, 0.38), transparent 28%), linear-gradient(145deg, #020617 0%, #0f172a 52%, #1d4ed8 100%)",
           }}
         >
           <Box
@@ -123,7 +123,7 @@ const LoginPage = () => {
               width: 360,
               height: 360,
               borderRadius: "50%",
-              border: "1px solid rgba(200, 169, 106, 0.24)",
+              border: "1px solid rgba(56, 189, 248, 0.26)",
               opacity: 0.8,
             }}
           />
@@ -137,8 +137,8 @@ const LoginPage = () => {
                   borderRadius: "50%",
                   display: "grid",
                   placeItems: "center",
-                  bgcolor: "rgba(255, 253, 248, 0.12)",
-                  border: "1px solid rgba(255, 253, 248, 0.18)",
+                  bgcolor: "rgba(248, 251, 255, 0.12)",
+                  border: "1px solid rgba(248, 251, 255, 0.18)",
                   fontWeight: 900,
                 }}
               >
@@ -152,8 +152,8 @@ const LoginPage = () => {
                 label="Gestión financiera personal"
                 sx={{
                   width: "fit-content",
-                  color: "secondary.contrastText",
-                  bgcolor: "secondary.main",
+                  color: "#020617",
+                  bgcolor: "#38bdf8",
                 }}
               />
 
@@ -165,7 +165,7 @@ const LoginPage = () => {
                 Controlá tus gastos con una experiencia simple y elegante.
               </Typography>
 
-              <Typography sx={{ color: "rgba(255, 253, 248, 0.72)", maxWidth: 520 }}>
+              <Typography sx={{ color: "rgba(248, 251, 255, 0.74)", maxWidth: 520 }}>
                 Visualizá tendencias, organizá categorías y mantené una lectura clara de tus decisiones financieras.
               </Typography>
             </Stack>
@@ -177,14 +177,14 @@ const LoginPage = () => {
             sx={{ position: "relative", mt: 5 }}
           >
             <Stack direction="row" spacing={1.25} alignItems="center">
-              <AutoGraphRoundedIcon color="secondary" />
-              <Typography variant="body2" sx={{ color: "rgba(255, 253, 248, 0.74)" }}>
+              <AutoGraphRoundedIcon sx={{ color: "#38bdf8" }} />
+              <Typography variant="body2" sx={{ color: "rgba(248, 251, 255, 0.74)" }}>
                 Dashboard global
               </Typography>
             </Stack>
             <Stack direction="row" spacing={1.25} alignItems="center">
-              <ShieldOutlinedIcon color="secondary" />
-              <Typography variant="body2" sx={{ color: "rgba(255, 253, 248, 0.74)" }}>
+              <ShieldOutlinedIcon sx={{ color: "#38bdf8" }} />
+              <Typography variant="body2" sx={{ color: "rgba(248, 251, 255, 0.74)" }}>
                 Sesión protegida
               </Typography>
             </Stack>
@@ -201,15 +201,18 @@ const LoginPage = () => {
           <Stack spacing={3} sx={{ width: "100%" }}>
             <Stack spacing={1}>
               <Box
-                sx={{
+                sx={(theme) => ({
                   width: 52,
                   height: 52,
                   borderRadius: "50%",
                   display: "grid",
                   placeItems: "center",
-                  bgcolor: "rgba(200, 169, 106, 0.16)",
-                  color: "secondary.dark",
-                }}
+                  bgcolor:
+                    theme.palette.mode === "dark"
+                      ? "rgba(56, 189, 248, 0.16)"
+                      : "rgba(37, 99, 235, 0.12)",
+                  color: "secondary.main",
+                })}
               >
                 <LockOutlinedIcon />
               </Box>
