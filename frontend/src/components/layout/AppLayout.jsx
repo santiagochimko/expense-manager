@@ -104,20 +104,41 @@ const AppLayout = () => {
       direction="row"
       spacing={0.75}
       alignItems="center"
-      sx={{ height: 40, flexShrink: 0 }}
+      sx={{
+        height: 40,
+        flexShrink: 0,
+        "& .MuiSwitch-root": {
+          width: 38,
+          height: 24,
+          p: 0,
+          display: "flex",
+          alignItems: "center",
+        },
+        "& .MuiSwitch-switchBase": {
+          p: "3px",
+        },
+        "& .MuiSwitch-thumb": {
+          width: 18,
+          height: 18,
+        },
+        "& .MuiSwitch-track": {
+          borderRadius: 999,
+        },
+      }}
     >
       <Switch
-        size="small"
         checked={isDark}
         onChange={toggleMode}
         inputProps={{ "aria-label": "Cambiar modo oscuro" }}
       />
 
-      {isDark ? (
-        <DarkModeOutlinedIcon fontSize="small" />
-      ) : (
-        <LightModeOutlinedIcon fontSize="small" />
-      )}
+      <Box sx={{ display: "grid", placeItems: "center", width: 20, height: 20 }}>
+        {isDark ? (
+          <DarkModeOutlinedIcon fontSize="small" />
+        ) : (
+          <LightModeOutlinedIcon fontSize="small" />
+        )}
+      </Box>
 
       <Typography variant="body2" fontWeight={700} lineHeight={1}>
         {isDark ? "Oscuro" : "Claro"}
@@ -223,15 +244,15 @@ const AppLayout = () => {
               : "rgba(248, 251, 255, 0.84)",
         })}
       >
-        <Toolbar disableGutters>
+        <Toolbar disableGutters sx={{ minHeight: { xs: 72, md: 80 } }}>
           <Container
             maxWidth="xl"
             sx={{
-              minHeight: { xs: 72, md: 82 },
+              minHeight: { xs: 72, md: 80 },
               display: "grid",
               gridTemplateColumns: { xs: "1fr auto", md: "1fr auto 1fr" },
               alignItems: "center",
-              gap: 2,
+              columnGap: 2,
               px: { xs: 2, sm: 3, md: 5 },
             }}
           >
@@ -288,7 +309,7 @@ const AppLayout = () => {
               spacing={0.75}
               alignItems="center"
               justifyContent="center"
-              sx={{ display: { xs: "none", md: "flex" } }}
+              sx={{ display: { xs: "none", md: "flex" }, height: 40 }}
             >
               {navItems.map((item) => {
                 const active = isActive(item.to);
@@ -322,9 +343,15 @@ const AppLayout = () => {
               spacing={1}
               alignItems="center"
               justifyContent="flex-end"
-              sx={{ minHeight: 40 }}
+              sx={{ height: 40, minWidth: 0 }}
             >
-              <Box sx={{ display: { xs: "none", sm: "flex" }, alignItems: "center" }}>
+              <Box
+                sx={{
+                  display: { xs: "none", sm: "flex" },
+                  alignItems: "center",
+                  height: 40,
+                }}
+              >
                 {modeSwitch}
               </Box>
 
@@ -337,7 +364,13 @@ const AppLayout = () => {
                   sx={{
                     display: { xs: "none", lg: "inline-flex" },
                     alignItems: "center",
-                    height: 32,
+                    height: 36,
+                    maxWidth: 170,
+                    "& .MuiChip-label": {
+                      display: "block",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    },
                   }}
                 />
               )}
@@ -349,8 +382,10 @@ const AppLayout = () => {
                 size="small"
                 sx={{
                   display: { xs: "none", sm: "inline-flex" },
+                  alignItems: "center",
                   minHeight: 40,
                   height: 40,
+                  px: 2,
                 }}
               >
                 Salir
