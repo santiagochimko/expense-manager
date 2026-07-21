@@ -10,8 +10,7 @@ export const registerSchema = Joi.object({
         .messages({
             "any.only": "Las contraseñas no coinciden",
             "any.required": "Debe repetir la contraseña"
-        }),
-    role: Joi.string().valid("user", "admin").required()
+        })
 });
 
 export const loginSchema = Joi.object({
