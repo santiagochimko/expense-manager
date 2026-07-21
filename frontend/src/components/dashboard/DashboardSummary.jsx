@@ -39,14 +39,14 @@ const DashboardSummary = () => {
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2.5}>
       <Box>
         <Typography variant="h5" component="h2">
           Resumen
         </Typography>
 
         <Typography color="text.secondary">
-          Estado general de tus gastos.
+          Estado general de tus gastos y tu plan actual.
         </Typography>
       </Box>
 
@@ -57,9 +57,10 @@ const DashboardSummary = () => {
           display: "grid",
           gridTemplateColumns: {
             xs: "1fr",
-            md: "repeat(4, 1fr)",
+            sm: "repeat(2, 1fr)",
+            lg: "repeat(4, 1fr)",
           },
-          gap: 2,
+          gap: 2.5,
         }}
       >
         <SummaryCard
