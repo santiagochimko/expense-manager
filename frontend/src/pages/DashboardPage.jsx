@@ -63,7 +63,7 @@ const DashboardPage = () => {
               component="h1"
               sx={{ fontSize: { xs: 40, sm: 52, md: 64 }, lineHeight: 0.95 }}
             >
-              Resumen elegante de tus gastos.
+              Resumen de tus gastos.
             </Typography>
 
             <Typography sx={{ color: "rgba(248, 251, 255, 0.74)", maxWidth: 560 }}>
