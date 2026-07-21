@@ -13,15 +13,18 @@ const ExpensesPage = () => {
         }}
       >
         <Box
-          sx={{
+          sx={(theme) => ({
             position: "absolute",
             top: -80,
             right: -60,
             width: 220,
             height: 220,
             borderRadius: "50%",
-            bgcolor: "rgba(200, 169, 106, 0.12)",
-          }}
+            bgcolor:
+              theme.palette.mode === "dark"
+                ? "rgba(56, 189, 248, 0.12)"
+                : "rgba(37, 99, 235, 0.1)",
+          })}
         />
 
         <Stack spacing={1.5} sx={{ position: "relative" }}>
