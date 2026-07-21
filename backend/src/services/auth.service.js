@@ -17,31 +17,30 @@ const generateToken = (user) => {
 };
 
 export const registerUser = async (userData) => {
-    const { username, email, password, role } = userData;
+    const { username, email, password } = userData;
 
-    //Verifico si ya existe username
+    // Verifico si ya existe username
     const existingUsername = await User.findOne({ username });
     if (existingUsername) {
         throw createError("El nombre de usuario ya existe", 409);
     }
 
-    //Verifico si ya existe email
+    // Verifico si ya existe email
     const existingEmail = await User.findOne({ email });
     if (existingEmail) {
         throw createError("El email ya está registrado", 409);
     }
 
-    //Hasheo password antes de guardar
+    // Hasheo password antes de guardar
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    //Si el rol es admin no maneja plan,
-    //por consistencia del modelo se deja el paln
-
+    // El registro público siempre crea usuarios comunes.
+    // Los administradores se inicializan desde variables de entorno en backend.
     const newUser = await User.create({
         username,
         email,
         password: hashedPassword,
-        role,
+        role: "user",
         plan: "plus"
     });
 
@@ -66,4 +65,4 @@ export const loginUser = async ({ username, password }) => {
     const token = generateToken(user);
 
     return { user, token };
-}
+};

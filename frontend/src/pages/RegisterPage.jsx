@@ -7,13 +7,8 @@ import {
   Box,
   Button,
   Container,
-  FormControl,
-  FormHelperText,
-  InputLabel,
   Link,
-  MenuItem,
   Paper,
-  Select,
   Stack,
   TextField,
   Typography,
@@ -38,9 +33,6 @@ const registerSchema = Yup.object({
     .trim()
     .email("Ingresá un email válido")
     .required("El email es obligatorio"),
-  role: Yup.string()
-    .oneOf(["user", "admin"], "Seleccioná un tipo válido")
-    .required("El tipo de usuario es obligatorio"),
   password: Yup.string()
     .min(6, "Mínimo 6 caracteres")
     .max(50, "Máximo 50 caracteres")
@@ -63,7 +55,6 @@ const RegisterPage = () => {
     initialValues: {
       username: "",
       email: "",
-      role: "user",
       password: "",
       confirmPassword: "",
     },
@@ -75,19 +66,13 @@ const RegisterPage = () => {
         registerUser({
           username: values.username.trim(),
           email: values.email.trim(),
-          role: values.role,
           password: values.password,
           confirmPassword: values.confirmPassword,
         })
       );
 
       if (registerUser.fulfilled.match(result)) {
-        const registeredUser = result.payload.user;
-
-        navigate(
-          registeredUser.role === "admin" ? "/admin/dashboard" : "/dashboard",
-          { replace: true }
-        );
+        navigate("/dashboard", { replace: true });
       }
     },
   });
@@ -157,35 +142,6 @@ const RegisterPage = () => {
                     : "Ingresá un email válido"
                 }
               />
-
-              <FormControl
-                fullWidth
-                required
-                error={
-                  Boolean(formik.touched.role) &&
-                  Boolean(formik.errors.role)
-                }
-              >
-                <InputLabel id="role-label">Tipo de usuario</InputLabel>
-
-                <Select
-                  labelId="role-label"
-                  label="Tipo de usuario"
-                  name="role"
-                  value={formik.values.role}
-                  onChange={formik.handleChange}
-                  onBlur={formik.handleBlur}
-                >
-                  <MenuItem value="user">Usuario</MenuItem>
-                  <MenuItem value="admin">Administrador</MenuItem>
-                </Select>
-
-                <FormHelperText>
-                  {formik.touched.role
-                    ? formik.errors.role
-                    : "Seleccioná el tipo de usuario para el registro"}
-                </FormHelperText>
-              </FormControl>
 
               <TextField
                 label="Contraseña"

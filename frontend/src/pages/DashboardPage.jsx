@@ -2,8 +2,6 @@ import { Stack, Typography } from "@mui/material";
 
 import DashboardSummary from "../components/dashboard/DashboardSummary.jsx";
 import DashboardCharts from "../components/dashboard/DashboardCharts.jsx";
-import CategoriesSection from "../components/categories/CategoriesSection.jsx";
-import ExpensesSection from "../components/expenses/ExpensesSection.jsx";
 import PlanUpgradeCard from "../components/users/PlanUpgradeCard.jsx";
 
 const DashboardPage = () => {
@@ -15,7 +13,7 @@ const DashboardPage = () => {
         </Typography>
 
         <Typography color="text.secondary">
-          Resumen y gestión general de tus gastos.
+          Resumen general y visualización de tus gastos.
         </Typography>
       </div>
       
@@ -24,10 +22,6 @@ const DashboardPage = () => {
       <DashboardSummary />
 
       <DashboardCharts />
-
-      <CategoriesSection />
-
-      <ExpensesSection />
     </Stack>
   );
 };

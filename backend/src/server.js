@@ -2,6 +2,7 @@ import dotenv from 'dotenv';
 import app from './app.js';
 import connectDB from './config/db.js';
 import { connectRedis } from './config/redis.js';
+import { ensureAdminUser } from './services/adminSeed.service.js';
 
 dotenv.config();
 
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 const startServer = async () => {
     try {
         await connectDB();
+        await ensureAdminUser();
         await connectRedis();
         
         app.listen(PORT, () => {
