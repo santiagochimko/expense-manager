@@ -11,6 +11,8 @@ import {
   Typography,
 } from "@mui/material";
 
+import { formatCalendarDate } from "../../utils/date.js";
+
 const paymentMethodLabels = {
   cash: "Efectivo",
   debit_card: "Débito",
@@ -18,13 +20,7 @@ const paymentMethodLabels = {
   transfer: "Transferencia",
 };
 
-const formatDate = (date) => {
-  if (!date) {
-    return "-";
-  }
-
-  return new Date(date).toLocaleDateString("es-UY");
-};
+const formatDate = formatCalendarDate;
 
 const AdminExpensesTable = ({ expenses }) => {
   if (expenses.length === 0) {

@@ -21,6 +21,10 @@ import {
   selectUploadLoading,
 } from "../../features/uploads/uploadsSelectors.js";
 import { clearUploadError } from "../../features/uploads/uploadsSlice.js";
+import {
+  getDateInputValue,
+  getLocalDateInputValue,
+} from "../../utils/date.js";
 
 const confidenceLabels = {
   low: "baja",
@@ -64,7 +68,7 @@ const expenseSchema = Yup.object({
 });
 
 const getTodayDate = () => {
-  return new Date().toISOString().slice(0, 10);
+  return getLocalDateInputValue();
 };
 
 const getInitialValues = (selectedExpense) => {
@@ -74,7 +78,7 @@ const getInitialValues = (selectedExpense) => {
       description: selectedExpense.description || "",
       amount: selectedExpense.amount || "",
       date: selectedExpense.date
-        ? new Date(selectedExpense.date).toISOString().slice(0, 10)
+        ? getDateInputValue(selectedExpense.date)
         : getTodayDate(),
       paymentMethod: selectedExpense.paymentMethod || "cash",
       category:

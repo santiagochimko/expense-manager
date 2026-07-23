@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 
 import ImagePreviewDialog from "../common/ImagePreviewDialog.jsx";
+import { formatCalendarDate } from "../../utils/date.js";
 
 const paymentMethodLabels = {
   cash: "Efectivo",
@@ -24,9 +25,7 @@ const paymentMethodLabels = {
   transfer: "Transferencia",
 };
 
-const formatDate = (date) => {
-  return new Date(date).toLocaleDateString("es-UY");
-};
+const formatDate = formatCalendarDate;
 
 const formatAmount = (amount) => {
   return `$${Number(amount || 0).toLocaleString("es-UY")}`;
