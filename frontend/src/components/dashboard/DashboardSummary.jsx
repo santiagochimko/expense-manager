@@ -16,6 +16,7 @@ import {
   selectDashboardSummary,
 } from "../../features/dashboard/dashboardSelectors.js";
 import { fetchDashboardSummary } from "../../features/dashboard/dashboardThunks.js";
+import { formatMoney } from "../../utils/currency.js";
 
 const DashboardSummary = () => {
   const dispatch = useDispatch();
@@ -46,7 +47,7 @@ const DashboardSummary = () => {
         </Typography>
 
         <Typography color="text.secondary">
-          Estado general de tus gastos y tu plan actual.
+          Estado general de tus gastos y tu plan actual. Los montos consolidados se muestran en UYU.
         </Typography>
       </Box>
 
@@ -71,14 +72,14 @@ const DashboardSummary = () => {
 
         <SummaryCard
           title="Monto total"
-          value={`$${summary?.totalAmount ?? 0}`}
-          helperText="Suma total acumulada"
+          value={formatMoney(summary?.totalAmount, "UYU")}
+          helperText="Suma total acumulada convertida a UYU"
         />
 
         <SummaryCard
           title="Monto del mes"
-          value={`$${summary?.currentMonthAmount ?? 0}`}
-          helperText="Total gastado este mes"
+          value={formatMoney(summary?.currentMonthAmount, "UYU")}
+          helperText="Total gastado este mes en UYU"
         />
 
         <SummaryCard
