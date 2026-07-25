@@ -25,6 +25,7 @@ import {
   getDateInputValue,
   getLocalDateInputValue,
 } from "../../utils/date.js";
+import { EXPENSE_CURRENCIES, currencyLabels } from "../../utils/currency.js";
 
 const confidenceLabels = {
   low: "baja",
@@ -50,6 +51,9 @@ const expenseSchema = Yup.object({
     .typeError("El monto debe ser numérico")
     .positive("El monto debe ser mayor a 0")
     .required("El monto es obligatorio"),
+  currency: Yup.string()
+    .oneOf(EXPENSE_CURRENCIES, "Moneda inválida")
+    .required("La moneda es obligatoria"),
   date: Yup.date()
     .typeError("La fecha debe ser válida")
     .required("La fecha es obligatoria"),
@@ -77,6 +81,7 @@ const getInitialValues = (selectedExpense) => {
       title: selectedExpense.title || "",
       description: selectedExpense.description || "",
       amount: selectedExpense.amount || "",
+      currency: selectedExpense.currency || "UYU",
       date: selectedExpense.date
         ? getDateInputValue(selectedExpense.date)
         : getTodayDate(),
@@ -93,6 +98,7 @@ const getInitialValues = (selectedExpense) => {
     title: "",
     description: "",
     amount: "",
+    currency: "UYU",
     date: getTodayDate(),
     paymentMethod: "cash",
     category: "",
@@ -134,6 +140,7 @@ const ExpenseForm = ({
         title: values.title.trim(),
         description: values.description.trim(),
         amount: Number(values.amount),
+        currency: values.currency,
         date: values.date,
         paymentMethod: values.paymentMethod,
         category: values.category,
@@ -202,6 +209,7 @@ const ExpenseForm = ({
   const titleError = getFieldError("title");
   const descriptionError = getFieldError("description");
   const amountError = getFieldError("amount");
+  const currencyError = getFieldError("currency");
   const dateError = getFieldError("date");
   const paymentMethodError = getFieldError("paymentMethod");
   const categoryError = getFieldError("category");
@@ -237,18 +245,44 @@ const ExpenseForm = ({
           helperText={descriptionError || "Detalle opcional del gasto"}
         />
 
-        <TextField
-          label="Monto"
-          name="amount"
-          type="number"
-          value={formik.values.amount}
-          onChange={formik.handleChange}
-          onBlur={formik.handleBlur}
-          fullWidth
-          required
-          error={Boolean(amountError)}
-          helperText={amountError || "Debe ser mayor a 0"}
-        />
+        <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
+          <TextField
+            label="Monto"
+            name="amount"
+            type="number"
+            value={formik.values.amount}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            fullWidth
+            required
+            error={Boolean(amountError)}
+            helperText={amountError || "Debe ser mayor a 0"}
+            sx={{ flex: 1 }}
+          />
+
+          <FormControl fullWidth required error={Boolean(currencyError)} sx={{ flex: { sm: 0.6 } }}>
+            <InputLabel id="expense-currency-label">Moneda</InputLabel>
+
+            <Select
+              labelId="expense-currency-label"
+              label="Moneda"
+              name="currency"
+              value={formik.values.currency}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+            >
+              {EXPENSE_CURRENCIES.map((currency) => (
+                <MenuItem key={currency} value={currency}>
+                  {currencyLabels[currency] || currency}
+                </MenuItem>
+              ))}
+            </Select>
+
+            <FormHelperText>
+              {currencyError || "UYU por defecto"}
+            </FormHelperText>
+          </FormControl>
+        </Stack>
 
         {!selectedExpense && (
           <Button

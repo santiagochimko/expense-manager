@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 
 import { formatCalendarDate } from "../../utils/date.js";
+import { formatMoney } from "../../utils/currency.js";
 
 const paymentMethodLabels = {
   cash: "Efectivo",
@@ -49,80 +50,93 @@ const AdminExpensesTable = ({ expenses }) => {
         </TableHead>
 
         <TableBody>
-          {expenses.map((expense) => (
-            <TableRow key={expense._id}>
-              <TableCell>{formatDate(expense.date)}</TableCell>
+          {expenses.map((expense) => {
+            const currency = expense.currency || "UYU";
 
-              <TableCell>
-                <Typography fontWeight={600}>{expense.title}</Typography>
-                {expense.description && (
-                  <Typography variant="body2" color="text.secondary">
-                    {expense.description}
+            return (
+              <TableRow key={expense._id}>
+                <TableCell>{formatDate(expense.date)}</TableCell>
+
+                <TableCell>
+                  <Typography fontWeight={600}>{expense.title}</Typography>
+                  {expense.description && (
+                    <Typography variant="body2" color="text.secondary">
+                      {expense.description}
+                    </Typography>
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  <Typography variant="body2">
+                    {expense.user?.username || "-"}
                   </Typography>
-                )}
-              </TableCell>
+                  <Typography variant="caption" color="text.secondary">
+                    {expense.user?.email || ""}
+                  </Typography>
+                </TableCell>
 
-              <TableCell>
-                <Typography variant="body2">
-                  {expense.user?.username || "-"}
-                </Typography>
-                <Typography variant="caption" color="text.secondary">
-                  {expense.user?.email || ""}
-                </Typography>
-              </TableCell>
-
-              <TableCell>
-                {expense.category ? (
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: 1,
-                    }}
-                  >
+                <TableCell>
+                  {expense.category ? (
                     <Box
                       sx={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        bgcolor: expense.category.color,
-                        border: "1px solid",
-                        borderColor: "divider",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 1,
                       }}
-                    />
-                    <Typography variant="body2">
-                      {expense.category.name}
+                    >
+                      <Box
+                        sx={{
+                          width: 12,
+                          height: 12,
+                          borderRadius: "50%",
+                          bgcolor: expense.category.color,
+                          border: "1px solid",
+                          borderColor: "divider",
+                        }}
+                      />
+                      <Typography variant="body2">
+                        {expense.category.name}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    "Sin categoría"
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  <Chip
+                    size="small"
+                    label={
+                      paymentMethodLabels[expense.paymentMethod] ||
+                      expense.paymentMethod ||
+                      "Sin método"
+                    }
+                    variant="outlined"
+                  />
+                </TableCell>
+
+                <TableCell>
+                  <Chip
+                    size="small"
+                    label={expense.isActive ? "Activo" : "Eliminado"}
+                    color={expense.isActive ? "success" : "default"}
+                    variant="outlined"
+                  />
+                </TableCell>
+
+                <TableCell align="right">
+                  <Typography fontWeight={700}>
+                    {formatMoney(expense.amount, currency)}
+                  </Typography>
+                  {currency !== "UYU" && expense.amountUYU && (
+                    <Typography variant="caption" color="text.secondary">
+                      ≈ {formatMoney(expense.amountUYU, "UYU")}
                     </Typography>
-                  </Box>
-                ) : (
-                  "Sin categoría"
-                )}
-              </TableCell>
-
-              <TableCell>
-                <Chip
-                  size="small"
-                  label={
-                    paymentMethodLabels[expense.paymentMethod] ||
-                    expense.paymentMethod ||
-                    "Sin método"
-                  }
-                  variant="outlined"
-                />
-              </TableCell>
-
-              <TableCell>
-                <Chip
-                  size="small"
-                  label={expense.isActive ? "Activo" : "Eliminado"}
-                  color={expense.isActive ? "success" : "default"}
-                  variant="outlined"
-                />
-              </TableCell>
-
-              <TableCell align="right">${expense.amount}</TableCell>
-            </TableRow>
-          ))}
+                  )}
+                </TableCell>
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </TableContainer>

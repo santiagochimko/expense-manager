@@ -12,7 +12,6 @@ const corsOptions = {
     origin: [
         "https://expense-manager-backend-delta.vercel.app",
         "https://expense-manager-gamma-seven.vercel.app",
-        "https://expense-manager-5liayeyxz-santiagochimkos-projects.vercel.app/",
     ],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

@@ -22,6 +22,7 @@ import {
   clearExpensesError,
   setExpenseFilters,
   setExpensePage,
+  setExpenseSort,
 } from "../../features/expenses/expensesSlice.js";
 import {
   createExpense,
@@ -199,6 +200,10 @@ const ExpensesSection = () => {
     dispatch(setExpensePage(newPage));
   };
 
+  const handleSortChange = (sortBy) => {
+    dispatch(setExpenseSort(sortBy));
+  };
+
   if (loading && expenses.length === 0) {
     return (
       <Paper sx={{ p: 3 }}>
@@ -231,7 +236,7 @@ const ExpensesSection = () => {
                 {selectedExpense ? "Editar gasto" : "Nuevo gasto"}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Registrá movimientos con categoría, método de pago y comprobante opcional.
+                Registrá movimientos con categoría, método de pago, moneda y comprobante opcional.
               </Typography>
             </Stack>
 
@@ -279,6 +284,9 @@ const ExpensesSection = () => {
             <ExpensesTable
               expenses={expenses || []}
               deleting={deleting}
+              sortBy={filters.sortBy || "date"}
+              sortOrder={filters.sortOrder || "desc"}
+              onSortChange={handleSortChange}
               onEdit={handleEdit}
               onDelete={handleRequestDelete}
             />

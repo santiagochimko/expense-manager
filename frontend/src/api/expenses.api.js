@@ -1,10 +1,12 @@
 import { apiRequest } from "./apiClient.js";
 
-const buildExpensesQuery = (filters) => {
+const buildExpensesQuery = (filters = {}) => {
   const params = new URLSearchParams();
 
   params.set("page", filters.page || 1);
   params.set("limit", filters.limit || 10);
+  params.set("sortBy", filters.sortBy || "date");
+  params.set("sortOrder", filters.sortOrder || "desc");
 
   if (filters.search) {
     params.set("search", filters.search);

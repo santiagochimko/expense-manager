@@ -1,5 +1,7 @@
 import { Box, Paper, Typography } from "@mui/material";
 
+import { formatMoney } from "../../utils/currency.js";
+
 const AdminSummaryCard = ({ title, value, helperText }) => {
   return (
     <Paper sx={{ p: 3 }}>
@@ -52,8 +54,8 @@ const AdminSummary = ({ dashboard }) => {
 
       <AdminSummaryCard
         title="Monto total"
-        value={`$${dashboard?.totalAmount ?? 0}`}
-        helperText="Monto global de gastos activos"
+        value={formatMoney(dashboard?.totalAmount, "UYU")}
+        helperText="Monto global de gastos activos convertido a UYU"
       />
 
       <AdminSummaryCard

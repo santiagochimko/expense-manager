@@ -17,6 +17,8 @@ const initialState = {
     category: "",
     page: 1,
     limit: 10,
+    sortBy: "date",
+    sortOrder: "desc",
   },
   loading: false,
   saving: false,
@@ -39,6 +41,20 @@ const expensesSlice = createSlice({
 
     setExpensePage: (state, action) => {
       state.filters.page = action.payload;
+    },
+
+    setExpenseSort: (state, action) => {
+      const sortBy = action.payload;
+
+      if (!["date", "amount"].includes(sortBy)) {
+        return;
+      }
+
+      const isSameColumn = state.filters.sortBy === sortBy;
+
+      state.filters.sortBy = sortBy;
+      state.filters.sortOrder = isSameColumn && state.filters.sortOrder === "desc" ? "asc" : "desc";
+      state.filters.page = 1;
     },
 
     clearExpensesError: (state) => {
@@ -165,6 +181,7 @@ const expensesSlice = createSlice({
 export const {
   setExpenseFilters,
   setExpensePage,
+  setExpenseSort,
   clearExpensesError,
   clearExpenses,
 } = expensesSlice.actions;
