@@ -25,14 +25,14 @@ export const getCalendarDateKey = (date) => {
     return new Date(date).toISOString().slice(0, 10);
 };
 
-const fetchRateFromCurrencyApi = async (currency, dateKey) => {
+const fetchRateFromCurrencyApiVersion = async (currency, version) => {
     const currencyKey = currency.toLowerCase();
     const response = await fetch(
-        `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${dateKey}/v1/currencies/${currencyKey}.json`
+        `https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${version}/v1/currencies/${currencyKey}.json`
     );
 
     if (!response.ok) {
-        throw new Error("No se pudo obtener el tipo de cambio histórico");
+        throw new Error("No se pudo obtener el tipo de cambio");
     }
 
     const data = await response.json();
@@ -43,6 +43,14 @@ const fetchRateFromCurrencyApi = async (currency, dateKey) => {
     }
 
     return Number(rate);
+};
+
+const fetchRateFromCurrencyApi = async (currency, dateKey) => {
+    try {
+        return await fetchRateFromCurrencyApiVersion(currency, dateKey);
+    } catch (error) {
+        return fetchRateFromCurrencyApiVersion(currency, "latest");
+    }
 };
 
 export const getExchangeRateToUYU = async (currency = "UYU", date = new Date()) => {
