@@ -124,7 +124,7 @@ const DashboardCharts = () => {
         </Typography>
 
         <Typography color="text.secondary">
-          Visualización de gastos por categoría, mes y método de pago.
+          Visualización de gastos por categoría, mes y método de pago. Los importes están convertidos a UYU.
         </Typography>
       </Box>
 
@@ -151,7 +151,7 @@ const DashboardCharts = () => {
                   <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
                   <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
                   <Tooltip {...tooltipProps} />
-                  <Bar dataKey="amount" name="Monto" fill={chartColor} radius={[10, 10, 0, 0]} />
+                  <Bar dataKey="amount" name="Monto UYU" fill={chartColor} radius={[10, 10, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Box>
@@ -172,7 +172,7 @@ const DashboardCharts = () => {
                   <Line
                     type="monotone"
                     dataKey="amount"
-                    name="Monto"
+                    name="Monto UYU"
                     stroke={lineColor}
                     strokeWidth={3}
                     dot={{ r: 4, fill: chartColor, strokeWidth: 0 }}
@@ -196,7 +196,7 @@ const DashboardCharts = () => {
                 <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
                 <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
                 <Tooltip {...tooltipProps} />
-                <Bar dataKey="amount" name="Monto" fill={chartColor} radius={[10, 10, 0, 0]} />
+                <Bar dataKey="amount" name="Monto UYU" fill={chartColor} radius={[10, 10, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </Box>
