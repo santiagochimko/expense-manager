@@ -9,6 +9,31 @@ import {
     deleteCacheByPattern,
     CACHE_TTL
 } from "../utils/cache.js";
+import {
+    convertAmountToUYU,
+    normalizeExpenseCurrency
+} from "../utils/currency.js";
+
+const getExpenseSort = (queryParams) => {
+    const sortBy = ["date", "amount"].includes(queryParams.sortBy)
+        ? queryParams.sortBy
+        : "date";
+    const sortOrder = queryParams.sortOrder === "asc" ? 1 : -1;
+
+    if (sortBy === "amount") {
+        return { amountUYU: sortOrder, amount: sortOrder, date: -1 };
+    }
+
+    return { date: sortOrder, createdAt: sortOrder };
+};
+
+const shouldRecalculateAmountUYU = (data) => {
+    return (
+        Object.prototype.hasOwnProperty.call(data, "amount") ||
+        Object.prototype.hasOwnProperty.call(data, "currency") ||
+        Object.prototype.hasOwnProperty.call(data, "date")
+    );
+};
 
 export const createExpense = async (data, userId) => {
     // Obtener usuario
@@ -29,9 +54,16 @@ export const createExpense = async (data, userId) => {
         }
     }
 
+    const currencyData = await convertAmountToUYU({
+        amount: data.amount,
+        currency: data.currency || "UYU",
+        date: data.date
+    });
+
     //Crear gasto
     const expense = await Expense.create({
         ...data,
+        ...currencyData,
         user: userId
     });
 
@@ -48,8 +80,10 @@ export const getExpensesByUser = async (userId, queryParams) => {
 
     const search = queryParams.search || "";
     const category = queryParams.category || "";
+    const sortBy = ["date", "amount"].includes(queryParams.sortBy) ? queryParams.sortBy : "date";
+    const sortOrder = queryParams.sortOrder === "asc" ? "asc" : "desc";
 
-    const cacheKey = `expenses:user:${userId}:page:${page}:limit:${limit}:search:${search}:category:${category}`;
+    const cacheKey = `expenses:user:${userId}:page:${page}:limit:${limit}:search:${search}:category:${category}:sortBy:${sortBy}:sortOrder:${sortOrder}`;
 
     const cachedExpenses = await getCache(cacheKey);
     if (cachedExpenses) {
@@ -75,7 +109,7 @@ export const getExpensesByUser = async (userId, queryParams) => {
     const expenses = await Expense.find(filters)
         .skip(skip)
         .limit(limit)
-        .sort({ date: -1 }) // Ordenar por fecha descendente
+        .sort(getExpenseSort({ sortBy, sortOrder }))
         .populate("category", "name color");
 
     const total = await Expense.countDocuments(filters);
@@ -117,13 +151,45 @@ export const getExpensesById = async (expenseId, userId) => {
 };
 
 export const updateExpense = async (expenseId, userId, data) => {
+    const currentExpense = await Expense.findOne({
+        _id: expenseId,
+        user: userId,
+        isActive: true
+    });
+
+    if (!currentExpense) {
+        throw createError("Gasto no encontrado", 404);
+    }
+
+    const nextData = { ...data };
+
+    if (Object.prototype.hasOwnProperty.call(nextData, "currency")) {
+        nextData.currency = normalizeExpenseCurrency(nextData.currency);
+    }
+
+    if (shouldRecalculateAmountUYU(nextData)) {
+        const currencyData = await convertAmountToUYU({
+            amount: Object.prototype.hasOwnProperty.call(nextData, "amount")
+                ? nextData.amount
+                : currentExpense.amount,
+            currency: Object.prototype.hasOwnProperty.call(nextData, "currency")
+                ? nextData.currency
+                : currentExpense.currency || "UYU",
+            date: Object.prototype.hasOwnProperty.call(nextData, "date")
+                ? nextData.date
+                : currentExpense.date
+        });
+
+        Object.assign(nextData, currencyData);
+    }
+
     const expense = await Expense.findOneAndUpdate(
         {
             _id: expenseId,
             user: userId,
             isActive: true
         },
-        data,
+        nextData,
         {
             new: true,
             runValidators: true
