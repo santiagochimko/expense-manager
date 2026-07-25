@@ -16,6 +16,22 @@ const expenseSchema = new mongoose.Schema(
             required: true,
             min: 0
         },
+        currency: {
+            type: String,
+            enum: ["UYU", "USD", "EUR"],
+            default: "UYU"
+        },
+        exchangeRateToUYU: {
+            type: Number,
+            required: true,
+            default: 1,
+            min: 0
+        },
+        amountUYU: {
+            type: Number,
+            required: true,
+            min: 0
+        },
         date: {
             type: Date,
             required: true
@@ -56,6 +72,7 @@ const expenseSchema = new mongoose.Schema(
 expenseSchema.index({ user: 1, date: -1 });
 expenseSchema.index({ category: 1 });
 expenseSchema.index({ title: 1 });
+expenseSchema.index({ amountUYU: 1 });
 
 const Expense = mongoose.model("Expense", expenseSchema);
 
