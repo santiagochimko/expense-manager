@@ -1,9 +1,12 @@
 import Joi from 'joi';
 
+const expenseCurrencyValues = ["UYU", "USD", "EUR"];
+
 export const createExpenseSchema = Joi.object({
     title: Joi.string().trim().min(2).max(100).required(),
     description: Joi.string().trim().allow("").optional(),
     amount: Joi.number().positive().required(),
+    currency: Joi.string().valid(...expenseCurrencyValues).default("UYU").optional(),
     date: Joi.date().required(),
     paymentMethod: Joi.string()
         .valid("cash", "debit_card", "credit_card", "transfer")
@@ -16,6 +19,7 @@ export const updateExpenseSchema = Joi.object({
     title: Joi.string().trim().min(2).max(100).optional(),
     description: Joi.string().trim().allow("").optional(),
     amount: Joi.number().positive().optional(),
+    currency: Joi.string().valid(...expenseCurrencyValues).optional(),
     date: Joi.date().optional(),
     paymentMethod: Joi.string()
         .valid("cash", "debit_card", "credit_card", "transfer")
