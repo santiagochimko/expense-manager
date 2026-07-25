@@ -3,6 +3,11 @@ import Expense from "../models/Expense.js";
 import User from "../models/User.js";
 import createError from "../utils/createError.js";
 import { getCache, setCache, CACHE_TTL } from "../utils/cache.js";
+import { getExpenseAmountUYU } from "../utils/currency.js";
+
+const getAmountUYUExpression = () => {
+    return { $ifNull: ["$amountUYU", "$amount"] };
+};
 
 export const getDashboardSummary = async (userId) => {
     const cacheKey = `dashboard:summary:${userId}`
@@ -26,24 +31,24 @@ export const getDashboardSummary = async (userId) => {
     const totalExpenses = expenses.length;
 
     const totalAmount = expenses.reduce((acc, expense) => {
-        return acc + expense.amount;
+        return acc + getExpenseAmountUYU(expense);
     }, 0);
 
     const today = new Date();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
+    const currentMonth = today.getUTCMonth();
+    const currentYear = today.getUTCFullYear();
 
     const currentMonthExpenses = expenses.filter((expense) => {
         const expenseDate = new Date(expense.date);
 
         return (
-            expenseDate.getMonth() === currentMonth &&
-            expenseDate.getFullYear() === currentYear
+            expenseDate.getUTCMonth() === currentMonth &&
+            expenseDate.getUTCFullYear() === currentYear
         );
     });
 
     const currentMonthAmount = currentMonthExpenses.reduce((acc, expense) => {
-        return acc + expense.amount;
+        return acc + getExpenseAmountUYU(expense);
     }, 0);
 
     let usage = null;
@@ -57,10 +62,11 @@ export const getDashboardSummary = async (userId) => {
     const result = {
         plan: user.plan,
         totalExpenses,
-        totalAmount,
-        currentMonthAmount,
+        totalAmount: Number(totalAmount.toFixed(2)),
+        currentMonthAmount: Number(currentMonthAmount.toFixed(2)),
         usage,
-        remaining
+        remaining,
+        baseCurrency: "UYU"
     };
 
     await setCache(cacheKey, result, CACHE_TTL.DASHBOARD);
@@ -88,7 +94,7 @@ export const getDashboardCharts = async (userId) => {
         {
             $group: {
                 _id: "$category",
-                totalAmount: { $sum: "$amount" },
+                totalAmount: { $sum: getAmountUYUExpression() },
                 totalCount: { $sum: 1 }
             }
         },
@@ -111,7 +117,7 @@ export const getDashboardCharts = async (userId) => {
                 _id: 1,
                 categoryName: "$category.name",
                 categoryColor: "$category.color",
-                totalAmount: 1,
+                totalAmount: { $round: ["$totalAmount", 2] },
                 totalCount: 1
             }
         }
@@ -127,8 +133,15 @@ export const getDashboardCharts = async (userId) => {
         {
             $group: {
                 _id: "$paymentMethod",
-                totalAmount: { $sum: "$amount" },
+                totalAmount: { $sum: getAmountUYUExpression() },
                 totalCount: { $sum: 1 }
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                totalAmount: { $round: ["$totalAmount", 2] },
+                totalCount: 1
             }
         }
     ]);
@@ -146,8 +159,15 @@ export const getDashboardCharts = async (userId) => {
                     year: { $year: "$date" },
                     month: { $month: "$date" }
                 },
-                totalAmount: { $sum: "$amount" },
+                totalAmount: { $sum: getAmountUYUExpression() },
                 totalCount: { $sum: 1 }
+            }
+        },
+        {
+            $project: {
+                _id: 1,
+                totalAmount: { $round: ["$totalAmount", 2] },
+                totalCount: 1
             }
         },
         {
@@ -159,6 +179,7 @@ export const getDashboardCharts = async (userId) => {
     ]);
 
     const result = {
+        baseCurrency: "UYU",
         expensesByCategory,
         expensesByPaymentMethod,
         expensesByMonth
