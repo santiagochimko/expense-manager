@@ -12,11 +12,13 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TableSortLabel,
   Typography,
 } from "@mui/material";
 
 import ImagePreviewDialog from "../common/ImagePreviewDialog.jsx";
 import { formatCalendarDate } from "../../utils/date.js";
+import { formatMoney } from "../../utils/currency.js";
 
 const paymentMethodLabels = {
   cash: "Efectivo",
@@ -27,8 +29,22 @@ const paymentMethodLabels = {
 
 const formatDate = formatCalendarDate;
 
-const formatAmount = (amount) => {
-  return `$${Number(amount || 0).toLocaleString("es-UY")}`;
+const AmountCell = ({ expense, align = "right" }) => {
+  const currency = expense?.currency || "UYU";
+
+  return (
+    <Box sx={{ textAlign: align }}>
+      <Typography fontWeight={900}>
+        {formatMoney(expense?.amount, currency)}
+      </Typography>
+
+      {currency !== "UYU" && expense?.amountUYU && (
+        <Typography variant="caption" color="text.secondary">
+          ≈ {formatMoney(expense.amountUYU, "UYU")}
+        </Typography>
+      )}
+    </Box>
+  );
 };
 
 const CategoryBadge = ({ category }) => {
@@ -57,7 +73,38 @@ const CategoryBadge = ({ category }) => {
   );
 };
 
-const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
+const SortableHeader = ({ children, sortKey, sortBy, sortOrder, onSortChange, align }) => {
+  const active = sortBy === sortKey;
+
+  return (
+    <TableCell align={align} sortDirection={active ? sortOrder : false}>
+      <TableSortLabel
+        active={active}
+        direction={active ? sortOrder : "desc"}
+        hideSortIcon={false}
+        onClick={() => onSortChange(sortKey)}
+        sx={{
+          fontWeight: 800,
+          "& .MuiTableSortLabel-icon": {
+            opacity: active ? 1 : 0.35,
+          },
+        }}
+      >
+        {children}
+      </TableSortLabel>
+    </TableCell>
+  );
+};
+
+const ExpensesTable = ({
+  expenses = [],
+  deleting,
+  sortBy = "date",
+  sortOrder = "desc",
+  onSortChange,
+  onEdit,
+  onDelete,
+}) => {
   const [previewImage, setPreviewImage] = useState(null);
 
   const handleOpenPreview = (expense) => {
@@ -102,9 +149,7 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                   </Typography>
                 </Box>
 
-                <Typography variant="h6" fontWeight={900} sx={{ whiteSpace: "nowrap" }}>
-                  {formatAmount(expense?.amount)}
-                </Typography>
+                <AmountCell expense={expense} />
               </Stack>
 
               {expense?.description && (
@@ -179,12 +224,27 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Fecha</TableCell>
+              <SortableHeader
+                sortKey="date"
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={onSortChange}
+              >
+                Fecha
+              </SortableHeader>
               <TableCell>Título</TableCell>
               <TableCell>Categoría</TableCell>
               <TableCell>Método</TableCell>
               <TableCell>Comprobante</TableCell>
-              <TableCell align="right">Monto</TableCell>
+              <SortableHeader
+                sortKey="amount"
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSortChange={onSortChange}
+                align="right"
+              >
+                Monto
+              </SortableHeader>
               <TableCell align="right">Acciones</TableCell>
             </TableRow>
           </TableHead>
@@ -272,7 +332,7 @@ const ExpensesTable = ({ expenses = [], deleting, onEdit, onDelete }) => {
                 </TableCell>
 
                 <TableCell align="right">
-                  <Typography fontWeight={900}>{formatAmount(expense?.amount)}</Typography>
+                  <AmountCell expense={expense} />
                 </TableCell>
 
                 <TableCell align="right">
