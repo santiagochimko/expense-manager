@@ -10,7 +10,6 @@ const app = express();
 //CORS para permitir futuras llamadas desde el frontend
 const corsOptions = {
     origin: [
-        "https://expense-manager-git-feature-exp-12d42d-santiagochimkos-projects.vercel.app/",
         "https://expense-manager-backend-delta.vercel.app",
         "https://expense-manager-gamma-seven.vercel.app",
     ],
