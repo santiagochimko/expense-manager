@@ -3,6 +3,10 @@ import Expense from "../models/Expense.js";
 import Category from "../models/Category.js";
 import { getPagination } from "../utils/pagination.js";
 
+const getAmountUYUExpression = () => {
+    return { $ifNull: ["$amountUYU", "$amount"] };
+};
+
 export const getAdminDashboard = async () => {
     const totalUsers = await User.countDocuments();
     const totalAdmins = await User.countDocuments({ role: "admin" });
@@ -39,7 +43,13 @@ export const getAdminDashboard = async () => {
         {
             $group: {
                 _id: null,
-                totalAmount: { $sum: "$amount" }
+                totalAmount: { $sum: getAmountUYUExpression() }
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                totalAmount: { $round: ["$totalAmount", 2] }
             }
         }
     ]);
@@ -58,7 +68,8 @@ export const getAdminDashboard = async () => {
         activeExpenses,
         deletedExpenses,
         totalExpenses: activeExpenses + deletedExpenses,
-        totalAmount
+        totalAmount,
+        baseCurrency: "UYU"
     };
 };
 
