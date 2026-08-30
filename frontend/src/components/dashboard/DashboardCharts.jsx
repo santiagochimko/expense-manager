@@ -4,11 +4,7 @@ import {
   Alert,
   Box,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Stack,
   Typography,
   useTheme,
@@ -107,6 +103,49 @@ const chartSx = {
   width: "100%",
   height: { xs: 320, sm: 360 },
   minWidth: 0,
+  maxWidth: "100%",
+  overflow: "hidden",
+};
+
+const NativeSelectField = ({ label, value, onChange, children, sx }) => {
+  return (
+    <Box sx={{ minWidth: 0, width: { xs: "100%", md: "auto" }, ...sx }}>
+      <Typography
+        component="label"
+        variant="caption"
+        color="text.secondary"
+        fontWeight={700}
+        sx={{ display: "block", mb: 0.5 }}
+      >
+        {label}
+      </Typography>
+
+      <Box
+        component="select"
+        value={value}
+        onChange={onChange}
+        sx={(theme) => ({
+          width: "100%",
+          height: 44,
+          px: 1.5,
+          borderRadius: 2,
+          border: "1px solid",
+          borderColor: theme.palette.divider,
+          bgcolor: theme.palette.background.paper,
+          color: theme.palette.text.primary,
+          font: "inherit",
+          outline: "none",
+          cursor: "pointer",
+          "&:focus": {
+            borderColor: theme.palette.primary.main,
+            boxShadow: `0 0 0 3px ${theme.palette.action.focus}`,
+          },
+        })}
+      >
+        {children}
+      </Box>
+    </Box>
+  );
 };
 
 const DashboardCharts = () => {
@@ -128,6 +167,7 @@ const DashboardCharts = () => {
   const resolvedSelectedMonth = monthOptions.includes(selectedMonth)
     ? selectedMonth
     : monthOptions.at(-1) || selectedMonth;
+  const selectedMonthOptions = monthOptions.length > 0 ? monthOptions : [resolvedSelectedMonth];
   const comparisonOptions = monthOptions.filter((month) => month < resolvedSelectedMonth);
   const resolvedComparisonMonth = comparisonOptions.includes(comparisonMonth)
     ? comparisonMonth
@@ -169,8 +209,8 @@ const DashboardCharts = () => {
   }
 
   return (
-    <Stack spacing={2.5}>
-      <Box>
+    <Stack spacing={2.5} sx={{ minWidth: 0, maxWidth: "100%" }}>
+      <Box sx={{ minWidth: 0 }}>
         <Typography variant="h5" component="h2">
           Comparativa por categoría
         </Typography>
@@ -183,49 +223,44 @@ const DashboardCharts = () => {
       {error && <Alert severity="error">{error}</Alert>}
 
       <DashboardChartCard title="Gastos por categoría">
-        <Stack spacing={2}>
-          <Stack
-            direction={{ xs: "column", md: "row" }}
-            spacing={1.5}
-            alignItems={{ xs: "stretch", md: "center" }}
-            justifyContent="space-between"
+        <Stack spacing={2} sx={{ minWidth: 0, maxWidth: "100%" }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(180px, 240px))" },
+              gap: 1.5,
+              alignItems: "end",
+              maxWidth: "100%",
+            }}
           >
-            <FormControl size="small" sx={{ minWidth: { md: 180 } }}>
-              <InputLabel id="category-chart-month-label">Mes a ver</InputLabel>
-              <Select
-                labelId="category-chart-month-label"
-                label="Mes a ver"
-                value={resolvedSelectedMonth}
-                onChange={(event) => {
-                  setSelectedMonth(event.target.value);
-                  setComparisonMonth("");
-                }}
-              >
-                {monthOptions.map((month) => (
-                  <MenuItem key={month} value={month}>
-                    {formatMonthLabel(month)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+            <NativeSelectField
+              label="Mes a ver"
+              value={resolvedSelectedMonth}
+              onChange={(event) => {
+                setSelectedMonth(event.target.value);
+                setComparisonMonth("");
+              }}
+            >
+              {selectedMonthOptions.map((month) => (
+                <option key={month} value={month}>
+                  {formatMonthLabel(month)}
+                </option>
+              ))}
+            </NativeSelectField>
 
-            <FormControl size="small" sx={{ minWidth: { md: 240 } }}>
-              <InputLabel id="category-chart-compare-label">Comparar con</InputLabel>
-              <Select
-                labelId="category-chart-compare-label"
-                label="Comparar con"
-                value={resolvedComparisonMonth}
-                onChange={(event) => setComparisonMonth(event.target.value)}
-              >
-                <MenuItem value="">Sin comparación</MenuItem>
-                {comparisonOptions.map((month) => (
-                  <MenuItem key={month} value={month}>
-                    {formatMonthLabel(month)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Stack>
+            <NativeSelectField
+              label="Comparar con"
+              value={resolvedComparisonMonth}
+              onChange={(event) => setComparisonMonth(event.target.value)}
+            >
+              <option value="">Sin comparación</option>
+              {comparisonOptions.map((month) => (
+                <option key={month} value={month}>
+                  {formatMonthLabel(month)}
+                </option>
+              ))}
+            </NativeSelectField>
+          </Box>
 
           {categoryChartData.length === 0 ? (
             <EmptyChartState />
