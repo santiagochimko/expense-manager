@@ -2,7 +2,6 @@ import { Link as RouterLink } from "react-router-dom";
 import { Box, Button, Chip, Paper, Stack, Typography } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import CategoryOutlinedIcon from "@mui/icons-material/CategoryOutlined";
-import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
 import DashboardSummary from "../components/dashboard/DashboardSummary.jsx";
 import DashboardCharts from "../components/dashboard/DashboardCharts.jsx";
@@ -75,7 +74,7 @@ const DashboardPage = () => {
             </Typography>
 
             <Typography sx={{ color: "rgba(248, 251, 255, 0.74)", maxWidth: 560 }}>
-              Visualizá el estado general, compará categorías y exportá tus gastos mensuales.
+              Visualizá el mes actual, filtrá categorías, compará períodos y exportá tus reportes.
             </Typography>
           </Stack>
 
@@ -132,35 +131,6 @@ const DashboardPage = () => {
       <DashboardSummary />
 
       <CategoryExpenseReport />
-
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 2,
-          flexWrap: "wrap",
-        }}
-      >
-        <Box>
-          <Typography variant="h5" component="h2">
-            Visualizaciones
-          </Typography>
-          <Typography color="text.secondary">
-            Lectura global por categoría, mes y método de pago.
-          </Typography>
-        </Box>
-
-        <Button
-          component={RouterLink}
-          to="/expenses"
-          variant="outlined"
-          startIcon={<ReceiptLongOutlinedIcon />}
-          sx={{ minHeight: 40, height: 40, py: 0 }}
-        >
-          Ver gastos
-        </Button>
-      </Box>
 
       <DashboardCharts />
     </Stack>
