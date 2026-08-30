@@ -10,8 +10,6 @@ import {
   Paper,
   Select,
   Stack,
-  ToggleButton,
-  ToggleButtonGroup,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -19,8 +17,7 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Line,
-  LineChart,
+  Legend,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -52,64 +49,63 @@ const getMonthKey = (item) => {
   return `${item._id.year}-${String(item._id.month).padStart(2, "0")}`;
 };
 
-const getCategoryChartData = (charts) => {
-  const expensesByCategory = charts?.expensesByCategory || [];
+const formatMonthLabel = (monthKey) => {
+  if (!monthKey) {
+    return "Mes";
+  }
 
-  return expensesByCategory.map((item) => ({
-    name: item.categoryName || "Sin categoría",
-    amount: item.totalAmount,
-    count: item.totalCount,
-  }));
+  const [year, month] = monthKey.split("-");
+
+  return `${month}/${year}`;
 };
 
-const getMonthlyCategoryChartData = (charts, selectedMonth) => {
+const getItemsByMonth = (charts, monthKey) => {
   const expensesByCategoryByMonth = charts?.expensesByCategoryByMonth || [];
 
-  return expensesByCategoryByMonth
-    .filter((item) => getMonthKey(item) === selectedMonth)
-    .map((item) => ({
-      name: item.categoryName || "Sin categoría",
-      amount: item.totalAmount,
-      count: item.totalCount,
-    }));
+  return expensesByCategoryByMonth.filter((item) => getMonthKey(item) === monthKey);
 };
 
-const getMonthlyChartData = (charts) => {
-  const expensesByMonth = charts?.expensesByMonth || [];
-  let accumulatedAmount = 0;
+const buildCategoryComparisonData = (charts, selectedMonth, comparisonMonth) => {
+  const selectedItems = getItemsByMonth(charts, selectedMonth);
+  const comparisonItems = comparisonMonth ? getItemsByMonth(charts, comparisonMonth) : [];
+  const rowsMap = new Map();
 
-  return expensesByMonth.map((item) => {
-    accumulatedAmount += Number(item.totalAmount || 0);
+  const ensureRow = (item) => {
+    const id = String(item?.categoryId || item?._id?.category || item?.categoryName || "uncategorized");
 
-    return {
-      name: `${item._id.month}/${item._id.year}`,
-      amount: item.totalAmount,
-      accumulatedAmount: Number(accumulatedAmount.toFixed(2)),
-      count: item.totalCount,
-    };
+    if (!rowsMap.has(id)) {
+      rowsMap.set(id, {
+        id,
+        name: item?.categoryName || "Sin categoría",
+        selectedAmount: 0,
+        comparisonAmount: 0,
+      });
+    }
+
+    return rowsMap.get(id);
+  };
+
+  selectedItems.forEach((item) => {
+    const row = ensureRow(item);
+    row.selectedAmount = Number(item.totalAmount || 0);
   });
-};
 
-const paymentMethodLabels = {
-  cash: "Efectivo",
-  debit_card: "Tarjeta de débito",
-  credit_card: "Tarjeta de crédito",
-  transfer: "Transferencia",
-};
+  comparisonItems.forEach((item) => {
+    const row = ensureRow(item);
+    row.comparisonAmount = Number(item.totalAmount || 0);
+  });
 
-const getPaymentMethodChartData = (charts) => {
-  const expensesByPaymentMethod = charts?.expensesByPaymentMethod || [];
+  return Array.from(rowsMap.values()).sort((a, b) => {
+    const totalA = a.selectedAmount + a.comparisonAmount;
+    const totalB = b.selectedAmount + b.comparisonAmount;
 
-  return expensesByPaymentMethod.map((item) => ({
-    name: paymentMethodLabels[item._id] || item._id || "Sin método",
-    amount: item.totalAmount,
-    count: item.totalCount,
-  }));
+    return totalB - totalA;
+  });
 };
 
 const chartSx = {
   width: "100%",
-  height: { xs: 280, sm: 320 },
+  height: { xs: 320, sm: 360 },
   minWidth: 0,
 };
 
@@ -121,31 +117,32 @@ const DashboardCharts = () => {
   const loading = useSelector(selectDashboardLoading);
   const error = useSelector(selectDashboardError);
 
-  const [categoryMode, setCategoryMode] = useState("historical");
   const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthKey());
+  const [comparisonMonth, setComparisonMonth] = useState("");
 
   useEffect(() => {
     dispatch(fetchDashboardCharts());
   }, [dispatch]);
 
   const monthOptions = charts?.availableMonths || [];
-  const selectedCategoryMonth = monthOptions.includes(selectedMonth)
+  const resolvedSelectedMonth = monthOptions.includes(selectedMonth)
     ? selectedMonth
     : monthOptions.at(-1) || selectedMonth;
+  const comparisonOptions = monthOptions.filter((month) => month < resolvedSelectedMonth);
+  const resolvedComparisonMonth = comparisonOptions.includes(comparisonMonth)
+    ? comparisonMonth
+    : "";
 
   const categoryChartData = useMemo(() => {
-    if (categoryMode === "monthly") {
-      return getMonthlyCategoryChartData(charts, selectedCategoryMonth);
-    }
-
-    return getCategoryChartData(charts);
-  }, [categoryMode, charts, selectedCategoryMonth]);
-
-  const monthlyChartData = getMonthlyChartData(charts);
-  const paymentMethodChartData = getPaymentMethodChartData(charts);
+    return buildCategoryComparisonData(
+      charts,
+      resolvedSelectedMonth,
+      resolvedComparisonMonth
+    );
+  }, [charts, resolvedSelectedMonth, resolvedComparisonMonth]);
 
   const chartColor = theme.palette.secondary.main;
-  const lineColor = theme.palette.primary.main;
+  const comparisonColor = theme.palette.primary.main;
   const gridColor = theme.palette.divider;
   const axisColor = theme.palette.text.secondary;
   const tooltipProps = {
@@ -175,137 +172,91 @@ const DashboardCharts = () => {
     <Stack spacing={2.5}>
       <Box>
         <Typography variant="h5" component="h2">
-          Gráficos
+          Comparativa por categoría
         </Typography>
 
         <Typography color="text.secondary">
-          Visualización de gastos por categoría, mes y método de pago. Los importes están convertidos a UYU.
+          Revisá el gasto mensual por categoría y comparalo side by side contra meses anteriores. Los importes están convertidos a UYU.
         </Typography>
       </Box>
 
       {error && <Alert severity="error">{error}</Alert>}
 
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: {
-            xs: "1fr",
-            lg: "1fr 1fr",
-          },
-          gap: 2.5,
-        }}
-      >
-        <DashboardChartCard title="Gastos por categoría">
-          <Stack spacing={2}>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={1.5}
-              alignItems={{ xs: "stretch", sm: "center" }}
-              justifyContent="space-between"
-            >
-              <ToggleButtonGroup
-                exclusive
-                size="small"
-                value={categoryMode}
-                onChange={(_, nextMode) => {
-                  if (nextMode) {
-                    setCategoryMode(nextMode);
-                  }
+      <DashboardChartCard title="Gastos por categoría">
+        <Stack spacing={2}>
+          <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={1.5}
+            alignItems={{ xs: "stretch", md: "center" }}
+            justifyContent="space-between"
+          >
+            <FormControl size="small" sx={{ minWidth: { md: 180 } }}>
+              <InputLabel id="category-chart-month-label">Mes a ver</InputLabel>
+              <Select
+                labelId="category-chart-month-label"
+                label="Mes a ver"
+                value={resolvedSelectedMonth}
+                onChange={(event) => {
+                  setSelectedMonth(event.target.value);
+                  setComparisonMonth("");
                 }}
               >
-                <ToggleButton value="historical">Histórico</ToggleButton>
-                <ToggleButton value="monthly">Mensual</ToggleButton>
-              </ToggleButtonGroup>
+                {monthOptions.map((month) => (
+                  <MenuItem key={month} value={month}>
+                    {formatMonthLabel(month)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
 
-              {categoryMode === "monthly" && (
-                <FormControl size="small" sx={{ minWidth: 180 }}>
-                  <InputLabel id="category-chart-month-label">Mes</InputLabel>
-                  <Select
-                    labelId="category-chart-month-label"
-                    label="Mes"
-                    value={selectedCategoryMonth}
-                    onChange={(event) => setSelectedMonth(event.target.value)}
-                  >
-                    {monthOptions.map((month) => (
-                      <MenuItem key={month} value={month}>
-                        {month}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              )}
-            </Stack>
-
-            {categoryChartData.length === 0 ? (
-              <EmptyChartState />
-            ) : (
-              <Box sx={chartSx}>
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={categoryChartData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                    <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
-                    <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
-                    <Tooltip {...tooltipProps} />
-                    <Bar dataKey="amount" name="Monto UYU" fill={chartColor} radius={[10, 10, 0, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </Box>
-            )}
+            <FormControl size="small" sx={{ minWidth: { md: 240 } }}>
+              <InputLabel id="category-chart-compare-label">Comparar con</InputLabel>
+              <Select
+                labelId="category-chart-compare-label"
+                label="Comparar con"
+                value={resolvedComparisonMonth}
+                onChange={(event) => setComparisonMonth(event.target.value)}
+              >
+                <MenuItem value="">Sin comparación</MenuItem>
+                {comparisonOptions.map((month) => (
+                  <MenuItem key={month} value={month}>
+                    {formatMonthLabel(month)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </Stack>
-        </DashboardChartCard>
 
-        <DashboardChartCard title="Evolución mensual">
-          {monthlyChartData.length === 0 ? (
+          {categoryChartData.length === 0 ? (
             <EmptyChartState />
           ) : (
             <Box sx={chartSx}>
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={monthlyChartData}>
+                <BarChart data={categoryChartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
                   <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
                   <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
                   <Tooltip {...tooltipProps} />
-                  <Line
-                    type="monotone"
-                    dataKey="amount"
-                    name="Monto mensual UYU"
-                    stroke={lineColor}
-                    strokeWidth={3}
-                    dot={{ r: 4, fill: chartColor, strokeWidth: 0 }}
-                    activeDot={{ r: 6, fill: chartColor, stroke: lineColor }}
+                  {resolvedComparisonMonth && <Legend />}
+                  <Bar
+                    dataKey="selectedAmount"
+                    name={`${formatMonthLabel(resolvedSelectedMonth)} UYU`}
+                    fill={chartColor}
+                    radius={[10, 10, 0, 0]}
                   />
-                  <Line
-                    type="monotone"
-                    dataKey="accumulatedAmount"
-                    name="Acumulado histórico UYU"
-                    stroke={chartColor}
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                    dot={false}
-                  />
-                </LineChart>
+                  {resolvedComparisonMonth && (
+                    <Bar
+                      dataKey="comparisonAmount"
+                      name={`${formatMonthLabel(resolvedComparisonMonth)} UYU`}
+                      fill={comparisonColor}
+                      radius={[10, 10, 0, 0]}
+                    />
+                  )}
+                </BarChart>
               </ResponsiveContainer>
             </Box>
           )}
-        </DashboardChartCard>
-      </Box>
-
-      <DashboardChartCard title="Gastos por método de pago">
-        {paymentMethodChartData.length === 0 ? (
-          <EmptyChartState />
-        ) : (
-          <Box sx={chartSx}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={paymentMethodChartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
-                <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
-                <Tooltip {...tooltipProps} />
-                <Bar dataKey="amount" name="Monto UYU" fill={chartColor} radius={[10, 10, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </Box>
-        )}
+        </Stack>
       </DashboardChartCard>
     </Stack>
   );
