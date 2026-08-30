@@ -6,7 +6,7 @@ import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
 import DashboardSummary from "../components/dashboard/DashboardSummary.jsx";
 import DashboardCharts from "../components/dashboard/DashboardCharts.jsx";
-import PlanUpgradeCard from "../components/users/PlanUpgradeCard.jsx";
+import CategoryExpenseReport from "../components/dashboard/CategoryExpenseReport.jsx";
 
 const ctaButtonSx = {
   minHeight: 40,
@@ -75,7 +75,7 @@ const DashboardPage = () => {
             </Typography>
 
             <Typography sx={{ color: "rgba(248, 251, 255, 0.74)", maxWidth: 560 }}>
-              Visualizá el estado general, detectá patrones y accedé rápido a las gestiones principales.
+              Visualizá el estado general, compará categorías y exportá tus gastos mensuales.
             </Typography>
           </Stack>
 
@@ -129,9 +129,9 @@ const DashboardPage = () => {
         </Box>
       </Paper>
 
-      <PlanUpgradeCard />
-
       <DashboardSummary />
+
+      <CategoryExpenseReport />
 
       <Box
         sx={{
