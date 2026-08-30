@@ -1,6 +1,7 @@
 import {
     getDashboardSummary,
-    getDashboardCharts
+    getDashboardCharts,
+    getDashboardCategoryReport
 } from "../services/dashboard.service.js";
 
 export const summary = async (req, res, next) => {
@@ -22,6 +23,19 @@ export const charts = async (req, res, next) => {
 
         res.status(200).json({
             messsage: "Datos de gráficos obtenidos correctamente",
+            data
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const categoryReport = async (req, res, next) => {
+    try {
+        const data = await getDashboardCategoryReport(req.user.id, req.query);
+
+        res.status(200).json({
+            messsage: "Reporte por categorías obtenido correctamente",
             data
         });
     } catch (error) {

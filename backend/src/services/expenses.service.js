@@ -36,22 +36,10 @@ const shouldRecalculateAmountUYU = (data) => {
 };
 
 export const createExpense = async (data, userId) => {
-    // Obtener usuario
     const user = await User.findById(userId);
 
     if (!user) {
         throw createError("Usuario no encontrado", 404);
-    }
-
-    //Validar limite si es Plus
-    if (user.plan === "plus") {
-        const count = await Expense.countDocuments({
-            user: userId,
-            isActive: true
-        });
-        if (count >= 4) {
-            throw createError("Has alcanzado el límite de 4 gastos para el plan Plus. Actualiza a Premium para tener gastos ilimitados.", 403);
-        }
     }
 
     const currencyData = await convertAmountToUYU({
@@ -60,7 +48,6 @@ export const createExpense = async (data, userId) => {
         date: data.date
     });
 
-    //Crear gasto
     const expense = await Expense.create({
         ...data,
         ...currencyData,
@@ -70,6 +57,7 @@ export const createExpense = async (data, userId) => {
     await deleteCacheByPattern(`expenses:user:${userId}*`);
     await deleteCache(`dashboard:summary:${userId}`);
     await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCacheByPattern(`dashboard:category-report:${userId}*`);
 
     return expense;
 };
@@ -90,18 +78,15 @@ export const getExpensesByUser = async (userId, queryParams) => {
         return cachedExpenses;
     }
 
-    //Filtro base: solo gastos del usuario y activos
     const filters = {
         user: userId,
         isActive: true
     };
 
-    //Filtro por categoría
     if (queryParams.category) {
         filters.category = queryParams.category;
     }
 
-    //Filtro por texto en title, usando regex case insensitive
     if (queryParams.search) {
         filters.title = { $regex: queryParams.search, $options: 'i' };
     }
@@ -203,6 +188,7 @@ export const updateExpense = async (expenseId, userId, data) => {
     await deleteCacheByPattern(`expenses:user:${userId}*`);
     await deleteCache(`dashboard:summary:${userId}`);
     await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCacheByPattern(`dashboard:category-report:${userId}*`);
 
     return expense;
 };
@@ -225,6 +211,7 @@ export const deleteExpense = async (expenseId, userId) => {
     await deleteCacheByPattern(`expenses:user:${userId}*`);
     await deleteCache(`dashboard:summary:${userId}`);
     await deleteCache(`dashboard:charts:${userId}`);
+    await deleteCacheByPattern(`dashboard:category-report:${userId}*`);
 
     return expense;
 };

@@ -34,14 +34,14 @@ export const registerUser = async (userData) => {
     // Hasheo password antes de guardar
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // El registro público siempre crea usuarios comunes.
+    // El registro público siempre crea usuarios comunes premium.
     // Los administradores se inicializan desde variables de entorno en backend.
     const newUser = await User.create({
         username,
         email,
         password: hashedPassword,
         role: "user",
-        plan: "plus"
+        plan: "premium"
     });
 
     const token = generateToken(newUser);

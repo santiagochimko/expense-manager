@@ -225,7 +225,7 @@ const AppLayout = () => {
       {user && (
         <Chip
           icon={<AccountCircleOutlinedIcon />}
-          label={`${user.username} · ${user.role}`}
+          label={user.username}
           variant="outlined"
           sx={{ width: "100%", justifyContent: "flex-start", mb: 1.5 }}
         />
@@ -372,7 +372,7 @@ const AppLayout = () => {
               {user && (
                 <Chip
                   icon={<AccountCircleOutlinedIcon />}
-                  label={`${user.username} · ${user.role}`}
+                  label={user.username}
                   size="small"
                   variant="outlined"
                   sx={{

@@ -43,11 +43,11 @@ const DashboardSummary = () => {
     <Stack spacing={2.5}>
       <Box>
         <Typography variant="h5" component="h2">
-          Resumen
+          Resumen del mes
         </Typography>
 
         <Typography color="text.secondary">
-          Estado general de tus gastos y tu plan actual. Los montos consolidados se muestran en UYU.
+          Lectura rápida del gasto actual. Los montos consolidados se muestran en UYU.
         </Typography>
       </Box>
 
@@ -58,42 +58,15 @@ const DashboardSummary = () => {
           display: "grid",
           gridTemplateColumns: {
             xs: "1fr",
-            sm: "repeat(2, 1fr)",
-            lg: "repeat(4, 1fr)",
+            sm: "minmax(240px, 420px)",
           },
           gap: 2.5,
         }}
       >
         <SummaryCard
-          title="Total de gastos"
-          value={summary?.totalExpenses ?? 0}
-          helperText="Cantidad de gastos registrados"
-        />
-
-        <SummaryCard
-          title="Monto total"
-          value={formatMoney(summary?.totalAmount, "UYU")}
-          helperText="Suma total acumulada convertida a UYU"
-        />
-
-        <SummaryCard
           title="Monto del mes"
           value={formatMoney(summary?.currentMonthAmount, "UYU")}
-          helperText="Total gastado este mes en UYU"
-        />
-
-        <SummaryCard
-          title={summary?.plan === "plus" ? "Gastos restantes" : "Plan"}
-          value={
-            summary?.plan === "plus"
-              ? summary?.remaining ?? 0
-              : summary?.plan ?? "-"
-          }
-          helperText={
-            summary?.plan === "plus"
-              ? "Disponibles antes de llegar al límite"
-              : "Plan actual del usuario"
-          }
+          helperText={`${summary?.currentMonthExpenses ?? 0} gastos registrados este mes`}
         />
       </Box>
     </Stack>
