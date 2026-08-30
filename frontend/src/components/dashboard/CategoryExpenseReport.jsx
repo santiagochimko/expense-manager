@@ -100,7 +100,7 @@ const buildCsv = (report) => {
     ["Total del mes", report?.totalAmount || 0],
     ["Total mes anterior", report?.previousTotalAmount || 0],
     [],
-    ["Categoría", "Fecha", "Título", "Método", "Monto original", "Moneda", "Monto UYU"],
+    ["Gasto", "Fecha", "Categoría", "Método", "Monto original", "Moneda", "Monto UYU"],
   ];
 
   const expensesByCategory = new Map();
@@ -120,9 +120,9 @@ const buildCsv = (report) => {
 
     expenses.forEach((expense) => {
       rows.push([
-        category.name,
-        formatCalendarDate(expense.date),
         expense.title,
+        formatCalendarDate(expense.date),
+        category.name,
         paymentMethodLabels[expense.paymentMethod] || expense.paymentMethod || "-",
         expense.amount,
         expense.currency || "UYU",
@@ -130,11 +130,11 @@ const buildCsv = (report) => {
       ]);
     });
 
-    rows.push([category.name, "", "TOTAL CATEGORÍA", "", "", "UYU", category.totalAmount || 0]);
+    rows.push(["TOTAL CATEGORÍA", "", category.name, "", "", "UYU", category.totalAmount || 0]);
     rows.push([]);
   });
 
-  rows.push(["", "", "TOTAL GENERAL", "", "", "UYU", report?.totalAmount || 0]);
+  rows.push(["TOTAL GENERAL", "", "", "", "", "UYU", report?.totalAmount || 0]);
 
   return rows
     .map((row) => row.map(escapeCsvValue).join(";"))
@@ -210,7 +210,7 @@ const CategoryExpenseReport = () => {
             startIcon={<FileDownloadOutlinedIcon />}
             disabled={!report || loading}
             onClick={handleExport}
-            sx={{ alignSelf: { xs: "stretch", md: "center" } }}
+            sx={{ alignSelf: { xs: "stretch", md: "flex-start" }, ml: { md: "auto" } }}
           >
             Exportar CSV
           </Button>
@@ -316,9 +316,9 @@ const CategoryExpenseReport = () => {
               <Table size="small">
                 <TableHead>
                   <TableRow>
-                    <TableCell>Categoría</TableCell>
-                    <TableCell>Fecha</TableCell>
                     <TableCell>Gasto</TableCell>
+                    <TableCell>Fecha</TableCell>
+                    <TableCell>Categoría</TableCell>
                     <TableCell>Método</TableCell>
                     <TableCell align="right">Monto original</TableCell>
                     <TableCell align="right">Monto UYU</TableCell>
@@ -327,9 +327,9 @@ const CategoryExpenseReport = () => {
                 <TableBody>
                   {(report?.expenses || []).map((expense) => (
                     <TableRow key={expense.id}>
-                      <TableCell>{expense.categoryName}</TableCell>
-                      <TableCell>{formatCalendarDate(expense.date)}</TableCell>
                       <TableCell>{expense.title}</TableCell>
+                      <TableCell>{formatCalendarDate(expense.date)}</TableCell>
+                      <TableCell>{expense.categoryName}</TableCell>
                       <TableCell>{paymentMethodLabels[expense.paymentMethod] || expense.paymentMethod || "-"}</TableCell>
                       <TableCell align="right">{formatMoney(expense.amount, expense.currency)}</TableCell>
                       <TableCell align="right">{formatMoney(expense.amountUYU, "UYU")}</TableCell>
