@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import {
+  fetchDashboardCategoryReport,
   fetchDashboardCharts,
   fetchDashboardSummary
 } from "./dashboardThunks.js";
@@ -7,8 +8,10 @@ import {
 const initialState = {
   summary: null,
   charts: null,
+  categoryReport: null,
   loadingSummary: false,
   loadingCharts: false,
+  loadingCategoryReport: false,
   error: null
 };
 
@@ -49,6 +52,20 @@ const dashboardSlice = createSlice({
         state.loadingCharts = false;
         state.error =
           action.payload?.message || "No se pudieron cargar los gráficos";
+      })
+
+      .addCase(fetchDashboardCategoryReport.pending, (state) => {
+        state.loadingCategoryReport = true;
+        state.error = null;
+      })
+      .addCase(fetchDashboardCategoryReport.fulfilled, (state, action) => {
+        state.loadingCategoryReport = false;
+        state.categoryReport = action.payload;
+      })
+      .addCase(fetchDashboardCategoryReport.rejected, (state, action) => {
+        state.loadingCategoryReport = false;
+        state.error =
+          action.payload?.message || "No se pudo cargar el reporte por categorías";
       });
   }
 });
