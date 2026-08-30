@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema(
         plan: {
             type: String,
             enum: ["plus", "premium"],
-            default: "plus"
+            default: "premium"
         },
         isActive: {
             type: Boolean,
