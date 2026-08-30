@@ -7,12 +7,7 @@ import {
   Checkbox,
   Chip,
   CircularProgress,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
   Paper,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -151,6 +146,7 @@ const CategoryExpenseReport = () => {
 
   const [month, setMonth] = useState(getCurrentMonthKey());
   const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
+  const [categoryPickerOpen, setCategoryPickerOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchDashboardCharts());
@@ -184,11 +180,26 @@ const CategoryExpenseReport = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleToggleCategory = (categoryId) => {
+    setSelectedCategoryIds((currentIds) => {
+      if (currentIds.includes(categoryId)) {
+        return currentIds.filter((id) => id !== categoryId);
+      }
+
+      return [...currentIds, categoryId];
+    });
+  };
+
+  const handleClearCategories = () => {
+    setSelectedCategoryIds([]);
+    setCategoryPickerOpen(false);
+  };
+
   const variationPrefix = Number(report?.variationAmount || 0) > 0 ? "+" : "";
 
   return (
-    <Paper sx={{ p: { xs: 2.5, sm: 3 } }}>
-      <Stack spacing={2.5}>
+    <Paper sx={{ p: { xs: 2.5, sm: 3 }, overflow: "hidden", maxWidth: "100%" }}>
+      <Stack spacing={2.5} sx={{ minWidth: 0, maxWidth: "100%" }}>
         <Box
           sx={{
             display: "grid",
@@ -196,6 +207,7 @@ const CategoryExpenseReport = () => {
             alignItems: { xs: "stretch", md: "flex-start" },
             gap: 2,
             width: "100%",
+            minWidth: 0,
           }}
         >
           <Box sx={{ minWidth: 0 }}>
@@ -228,44 +240,121 @@ const CategoryExpenseReport = () => {
           </Box>
         </Box>
 
-        <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems={{ xs: "stretch", md: "center" }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "180px minmax(0, 1fr) auto" },
+            gap: 2,
+            alignItems: "start",
+            width: "100%",
+            minWidth: 0,
+          }}
+        >
           <TextField
             label="Mes"
             type="month"
             value={month}
             onChange={(event) => setMonth(event.target.value)}
             slotProps={{ inputLabel: { shrink: true } }}
-            sx={{ minWidth: { md: 180 } }}
+            fullWidth
           />
 
-          <FormControl sx={{ minWidth: { md: 280 }, flex: { md: 1 } }}>
-            <InputLabel id="category-report-filter-label">Categorías</InputLabel>
-            <Select
-              multiple
-              labelId="category-report-filter-label"
-              label="Categorías"
-              value={selectedCategoryIds}
-              renderValue={() => selectedCategoriesLabel}
-              onChange={(event) => {
-                const value = event.target.value;
-                setSelectedCategoryIds(typeof value === "string" ? value.split(",") : value);
+          <Box sx={{ minWidth: 0, maxWidth: "100%" }}>
+            <Button
+              type="button"
+              variant="outlined"
+              fullWidth
+              onClick={() => setCategoryPickerOpen((isOpen) => !isOpen)}
+              sx={{
+                minHeight: 56,
+                justifyContent: "space-between",
+                px: 1.75,
+                color: "text.primary",
+                borderColor: "divider",
+                textTransform: "none",
               }}
             >
-              {categoryOptions.map((category) => (
-                <MenuItem key={category.id} value={category.id}>
-                  <Checkbox checked={selectedCategoryIds.includes(category.id)} />
-                  <ListItemText primary={category.name} />
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+              <Box
+                component="span"
+                sx={{
+                  minWidth: 0,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Categorías · {selectedCategoriesLabel}
+              </Box>
+              <Box component="span" sx={{ color: "text.secondary", ml: 1 }}>
+                {categoryPickerOpen ? "Cerrar" : "Elegir"}
+              </Box>
+            </Button>
+
+            {categoryPickerOpen && (
+              <Paper
+                variant="outlined"
+                sx={{
+                  mt: 1,
+                  p: 1,
+                  maxHeight: 280,
+                  overflowY: "auto",
+                  overflowX: "hidden",
+                  maxWidth: "100%",
+                }}
+              >
+                {categoryOptions.map((category) => (
+                  <Box
+                    key={category.id}
+                    component="label"
+                    sx={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                      minHeight: 44,
+                      px: 1,
+                      borderRadius: 2,
+                      cursor: "pointer",
+                      "&:hover": {
+                        bgcolor: "action.hover",
+                      },
+                    }}
+                  >
+                    <Checkbox
+                      checked={selectedCategoryIds.includes(category.id)}
+                      onChange={() => handleToggleCategory(category.id)}
+                      size="small"
+                    />
+                    <Box
+                      component="span"
+                      sx={{
+                        width: 10,
+                        height: 10,
+                        borderRadius: "50%",
+                        bgcolor: category.color,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <Typography sx={{ minWidth: 0 }} noWrap>
+                      {category.name}
+                    </Typography>
+                  </Box>
+                ))}
+
+                {categoryOptions.length === 0 && (
+                  <Typography color="text.secondary" sx={{ px: 1, py: 1.5 }}>
+                    No hay categorías disponibles para filtrar.
+                  </Typography>
+                )}
+              </Paper>
+            )}
+          </Box>
 
           {selectedCategoryIds.length > 0 && (
-            <Button type="button" variant="outlined" onClick={() => setSelectedCategoryIds([])}>
+            <Button type="button" variant="outlined" onClick={handleClearCategories} sx={{ minHeight: 56 }}>
               Ver todas
             </Button>
           )}
-        </Stack>
+        </Box>
 
         {error && <Alert severity="error">{error}</Alert>}
 
@@ -274,37 +363,38 @@ const CategoryExpenseReport = () => {
             <CircularProgress />
           </Box>
         ) : (
-          <Stack spacing={2.5}>
+          <Stack spacing={2.5} sx={{ minWidth: 0, maxWidth: "100%" }}>
             <Box
               sx={{
                 display: "grid",
                 gridTemplateColumns: { xs: "1fr", md: "repeat(3, 1fr)" },
                 gap: 2,
+                minWidth: 0,
               }}
             >
-              <Paper variant="outlined" sx={{ p: 2 }}>
+              <Paper variant="outlined" sx={{ p: 2, minWidth: 0 }}>
                 <Typography variant="body2" color="text.secondary">
                   Total filtrado
                 </Typography>
-                <Typography variant="h5" fontWeight={900}>
+                <Typography variant="h5" fontWeight={900} sx={{ overflowWrap: "anywhere" }}>
                   {formatMoney(report?.totalAmount, "UYU")}
                 </Typography>
               </Paper>
 
-              <Paper variant="outlined" sx={{ p: 2 }}>
+              <Paper variant="outlined" sx={{ p: 2, minWidth: 0 }}>
                 <Typography variant="body2" color="text.secondary">
                   Mes anterior
                 </Typography>
-                <Typography variant="h5" fontWeight={900}>
+                <Typography variant="h5" fontWeight={900} sx={{ overflowWrap: "anywhere" }}>
                   {formatMoney(report?.previousTotalAmount, "UYU")}
                 </Typography>
               </Paper>
 
-              <Paper variant="outlined" sx={{ p: 2 }}>
+              <Paper variant="outlined" sx={{ p: 2, minWidth: 0 }}>
                 <Typography variant="body2" color="text.secondary">
                   Variación
                 </Typography>
-                <Typography variant="h5" fontWeight={900}>
+                <Typography variant="h5" fontWeight={900} sx={{ overflowWrap: "anywhere" }}>
                   {variationPrefix}{formatMoney(report?.variationAmount, "UYU")}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -313,19 +403,46 @@ const CategoryExpenseReport = () => {
               </Paper>
             </Box>
 
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Box
+              sx={{
+                display: "grid",
+                gridTemplateColumns: { xs: "1fr", sm: "repeat(auto-fit, minmax(220px, 1fr))" },
+                gap: 1,
+                minWidth: 0,
+                maxWidth: "100%",
+              }}
+            >
               {(report?.categories || []).map((category) => (
                 <Chip
                   key={category.id}
                   label={`${category.name}: ${formatMoney(category.totalAmount, "UYU")}`}
                   variant="outlined"
-                  sx={{ borderColor: category.color }}
+                  sx={{
+                    borderColor: category.color,
+                    width: "100%",
+                    maxWidth: "100%",
+                    justifyContent: "flex-start",
+                    "& .MuiChip-label": {
+                      display: "block",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    },
+                  }}
                 />
               ))}
-            </Stack>
+            </Box>
 
-            <TableContainer component={Paper} variant="outlined">
-              <Table size="small">
+            <TableContainer
+              component={Paper}
+              variant="outlined"
+              sx={{
+                width: "100%",
+                maxWidth: "100%",
+                overflowX: "auto",
+                WebkitOverflowScrolling: "touch",
+              }}
+            >
+              <Table size="small" sx={{ minWidth: 760 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Gasto</TableCell>
