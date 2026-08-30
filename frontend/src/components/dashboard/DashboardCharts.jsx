@@ -1,11 +1,17 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Alert,
   Box,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Stack,
+  ToggleButton,
+  ToggleButtonGroup,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -30,6 +36,22 @@ import {
 } from "../../features/dashboard/dashboardSelectors.js";
 import { fetchDashboardCharts } from "../../features/dashboard/dashboardThunks.js";
 
+const getCurrentMonthKey = () => {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+
+  return `${year}-${month}`;
+};
+
+const getMonthKey = (item) => {
+  if (!item?._id?.year || !item?._id?.month) {
+    return "";
+  }
+
+  return `${item._id.year}-${String(item._id.month).padStart(2, "0")}`;
+};
+
 const getCategoryChartData = (charts) => {
   const expensesByCategory = charts?.expensesByCategory || [];
 
@@ -40,14 +62,32 @@ const getCategoryChartData = (charts) => {
   }));
 };
 
+const getMonthlyCategoryChartData = (charts, selectedMonth) => {
+  const expensesByCategoryByMonth = charts?.expensesByCategoryByMonth || [];
+
+  return expensesByCategoryByMonth
+    .filter((item) => getMonthKey(item) === selectedMonth)
+    .map((item) => ({
+      name: item.categoryName || "Sin categoría",
+      amount: item.totalAmount,
+      count: item.totalCount,
+    }));
+};
+
 const getMonthlyChartData = (charts) => {
   const expensesByMonth = charts?.expensesByMonth || [];
+  let accumulatedAmount = 0;
 
-  return expensesByMonth.map((item) => ({
-    name: `${item._id.month}/${item._id.year}`,
-    amount: item.totalAmount,
-    count: item.totalCount,
-  }));
+  return expensesByMonth.map((item) => {
+    accumulatedAmount += Number(item.totalAmount || 0);
+
+    return {
+      name: `${item._id.month}/${item._id.year}`,
+      amount: item.totalAmount,
+      accumulatedAmount: Number(accumulatedAmount.toFixed(2)),
+      count: item.totalCount,
+    };
+  });
 };
 
 const paymentMethodLabels = {
@@ -81,11 +121,26 @@ const DashboardCharts = () => {
   const loading = useSelector(selectDashboardLoading);
   const error = useSelector(selectDashboardError);
 
+  const [categoryMode, setCategoryMode] = useState("historical");
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonthKey());
+
   useEffect(() => {
     dispatch(fetchDashboardCharts());
   }, [dispatch]);
 
-  const categoryChartData = getCategoryChartData(charts);
+  const monthOptions = charts?.availableMonths || [];
+  const selectedCategoryMonth = monthOptions.includes(selectedMonth)
+    ? selectedMonth
+    : monthOptions.at(-1) || selectedMonth;
+
+  const categoryChartData = useMemo(() => {
+    if (categoryMode === "monthly") {
+      return getMonthlyCategoryChartData(charts, selectedCategoryMonth);
+    }
+
+    return getCategoryChartData(charts);
+  }, [categoryMode, charts, selectedCategoryMonth]);
+
   const monthlyChartData = getMonthlyChartData(charts);
   const paymentMethodChartData = getPaymentMethodChartData(charts);
 
@@ -141,21 +196,62 @@ const DashboardCharts = () => {
         }}
       >
         <DashboardChartCard title="Gastos por categoría">
-          {categoryChartData.length === 0 ? (
-            <EmptyChartState />
-          ) : (
-            <Box sx={chartSx}>
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={categoryChartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
-                  <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
-                  <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
-                  <Tooltip {...tooltipProps} />
-                  <Bar dataKey="amount" name="Monto UYU" fill={chartColor} radius={[10, 10, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </Box>
-          )}
+          <Stack spacing={2}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1.5}
+              alignItems={{ xs: "stretch", sm: "center" }}
+              justifyContent="space-between"
+            >
+              <ToggleButtonGroup
+                exclusive
+                size="small"
+                value={categoryMode}
+                onChange={(_, nextMode) => {
+                  if (nextMode) {
+                    setCategoryMode(nextMode);
+                  }
+                }}
+              >
+                <ToggleButton value="historical">Histórico</ToggleButton>
+                <ToggleButton value="monthly">Mensual</ToggleButton>
+              </ToggleButtonGroup>
+
+              {categoryMode === "monthly" && (
+                <FormControl size="small" sx={{ minWidth: 180 }}>
+                  <InputLabel id="category-chart-month-label">Mes</InputLabel>
+                  <Select
+                    labelId="category-chart-month-label"
+                    label="Mes"
+                    value={selectedCategoryMonth}
+                    onChange={(event) => setSelectedMonth(event.target.value)}
+                  >
+                    {monthOptions.map((month) => (
+                      <MenuItem key={month} value={month}>
+                        {month}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Stack>
+
+            {categoryChartData.length === 0 ? (
+              <EmptyChartState />
+            ) : (
+              <Box sx={chartSx}>
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={categoryChartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+                    <XAxis dataKey="name" tick={{ fill: axisColor, fontSize: 12 }} />
+                    <YAxis tick={{ fill: axisColor, fontSize: 12 }} />
+                    <Tooltip {...tooltipProps} />
+                    <Bar dataKey="amount" name="Monto UYU" fill={chartColor} radius={[10, 10, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Box>
+            )}
+          </Stack>
         </DashboardChartCard>
 
         <DashboardChartCard title="Evolución mensual">
@@ -172,11 +268,20 @@ const DashboardCharts = () => {
                   <Line
                     type="monotone"
                     dataKey="amount"
-                    name="Monto UYU"
+                    name="Monto mensual UYU"
                     stroke={lineColor}
                     strokeWidth={3}
                     dot={{ r: 4, fill: chartColor, strokeWidth: 0 }}
                     activeDot={{ r: 6, fill: chartColor, stroke: lineColor }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="accumulatedAmount"
+                    name="Acumulado histórico UYU"
+                    stroke={chartColor}
+                    strokeWidth={2}
+                    strokeDasharray="5 5"
+                    dot={false}
                   />
                 </LineChart>
               </ResponsiveContainer>
