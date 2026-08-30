@@ -189,13 +189,16 @@ const CategoryExpenseReport = () => {
   return (
     <Paper sx={{ p: { xs: 2.5, sm: 3 } }}>
       <Stack spacing={2.5}>
-        <Stack
-          direction={{ xs: "column", md: "row" }}
-          justifyContent="space-between"
-          alignItems={{ xs: "stretch", md: "flex-start" }}
-          spacing={2}
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: { xs: "1fr", md: "minmax(0, 1fr) auto" },
+            alignItems: { xs: "stretch", md: "flex-start" },
+            gap: 2,
+            width: "100%",
+          }}
         >
-          <Box>
+          <Box sx={{ minWidth: 0 }}>
             <Typography variant="h5" component="h2">
               Reporte por categorías
             </Typography>
@@ -205,16 +208,25 @@ const CategoryExpenseReport = () => {
             </Typography>
           </Box>
 
-          <Button
-            variant="contained"
-            startIcon={<FileDownloadOutlinedIcon />}
-            disabled={!report || loading}
-            onClick={handleExport}
-            sx={{ alignSelf: { xs: "stretch", md: "flex-start" }, ml: { md: "auto" } }}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: { xs: "stretch", md: "flex-end" },
+              justifySelf: { xs: "stretch", md: "end" },
+              width: { xs: "100%", md: "auto" },
+            }}
           >
-            Exportar CSV
-          </Button>
-        </Stack>
+            <Button
+              variant="contained"
+              startIcon={<FileDownloadOutlinedIcon />}
+              disabled={!report || loading}
+              onClick={handleExport}
+              sx={{ width: { xs: "100%", md: "auto" } }}
+            >
+              Exportar CSV
+            </Button>
+          </Box>
+        </Box>
 
         <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems={{ xs: "stretch", md: "center" }}>
           <TextField
