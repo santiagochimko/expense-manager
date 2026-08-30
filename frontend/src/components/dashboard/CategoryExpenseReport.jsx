@@ -5,7 +5,6 @@ import {
   Box,
   Button,
   Checkbox,
-  Chip,
   CircularProgress,
   Paper,
   Stack,
@@ -401,35 +400,6 @@ const CategoryExpenseReport = () => {
                   {variationPrefix}{report?.variationPercent ?? 0}% contra {report?.previousMonth}
                 </Typography>
               </Paper>
-            </Box>
-
-            <Box
-              sx={{
-                display: "grid",
-                gridTemplateColumns: { xs: "1fr", sm: "repeat(auto-fit, minmax(220px, 1fr))" },
-                gap: 1,
-                minWidth: 0,
-                maxWidth: "100%",
-              }}
-            >
-              {(report?.categories || []).map((category) => (
-                <Chip
-                  key={category.id}
-                  label={`${category.name}: ${formatMoney(category.totalAmount, "UYU")}`}
-                  variant="outlined"
-                  sx={{
-                    borderColor: category.color,
-                    width: "100%",
-                    maxWidth: "100%",
-                    justifyContent: "flex-start",
-                    "& .MuiChip-label": {
-                      display: "block",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                    },
-                  }}
-                />
-              ))}
             </Box>
 
             <TableContainer
